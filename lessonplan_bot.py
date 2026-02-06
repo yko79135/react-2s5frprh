@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import re
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
 from typing import Iterable
 
@@ -18,7 +19,7 @@ class WeekItem:
     details: str
 
 
-def extract_pdf_text(path: Path) -> str:
+def _get_pdf_reader(binary_data: bytes | None = None, path: Path | None = None):
     try:
         from pypdf import PdfReader
     except ModuleNotFoundError as exc:
@@ -26,7 +27,20 @@ def extract_pdf_text(path: Path) -> str:
             "Missing dependency 'pypdf'. Install requirements with: pip install -r requirements-lessonplan.txt"
         ) from exc
 
-    reader = PdfReader(str(path))
+    if binary_data is not None:
+        return PdfReader(BytesIO(binary_data))
+    if path is not None:
+        return PdfReader(str(path))
+    raise ValueError("Provide either binary_data or path")
+
+
+def extract_pdf_text(path: Path) -> str:
+    reader = _get_pdf_reader(path=path)
+    return "\n".join((page.extract_text() or "") for page in reader.pages)
+
+
+def extract_pdf_text_from_bytes(pdf_data: bytes) -> str:
+    reader = _get_pdf_reader(binary_data=pdf_data)
     return "\n".join((page.extract_text() or "") for page in reader.pages)
 
 
@@ -150,9 +164,10 @@ def generate_document_text(
     return header + body
 
 
-def publish_to_google_docs(
+def create_google_doc_in_folder(
     doc_title: str,
     doc_text: str,
+    folder_id: str,
     credentials_path: Path,
     token_path: Path,
     service_account_path: Path | None,
@@ -173,31 +188,49 @@ def publish_to_google_docs(
         creds = None
         if token_path.exists():
             creds = Credentials.from_authorized_user_file(str(token_path), scopes)
-
         if not creds or not creds.valid:
             flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), scopes)
             creds = flow.run_local_server(port=0)
             token_path.write_text(creds.to_json(), encoding="utf-8")
 
+    drive_service = build("drive", "v3", credentials=creds)
     docs_service = build("docs", "v1", credentials=creds)
-    doc = docs_service.documents().create(body={"title": doc_title}).execute()
-    doc_id = doc["documentId"]
+
+    file_meta = {
+        "name": doc_title,
+        "mimeType": "application/vnd.google-apps.document",
+        "parents": [folder_id],
+    }
+    created = (
+        drive_service.files()
+        .create(body=file_meta, fields="id", supportsAllDrives=True)
+        .execute()
+    )
+    doc_id = created["id"]
 
     docs_service.documents().batchUpdate(
         documentId=doc_id,
-        body={
-            "requests": [
-                {
-                    "insertText": {
-                        "location": {"index": 1},
-                        "text": doc_text,
-                    }
-                }
-            ]
-        },
+        body={"requests": [{"insertText": {"location": {"index": 1}, "text": doc_text}}]},
     ).execute()
 
     return f"https://docs.google.com/document/d/{doc_id}/edit"
+
+
+def publish_to_google_docs(
+    doc_title: str,
+    doc_text: str,
+    credentials_path: Path,
+    token_path: Path,
+    service_account_path: Path | None,
+) -> str:
+    return create_google_doc_in_folder(
+        doc_title=doc_title,
+        doc_text=doc_text,
+        folder_id="root",
+        credentials_path=credentials_path,
+        token_path=token_path,
+        service_account_path=service_account_path,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -205,48 +238,20 @@ def build_parser() -> argparse.ArgumentParser:
         description="Generate weekly lesson plans/reports from a syllabus PDF and optionally post to Google Docs."
     )
     parser.add_argument("--syllabus", required=True, type=Path, help="Path to syllabus PDF file")
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=Path("weekly_lesson_plan_report.txt"),
-        help="Output text file path for generated plans",
-    )
+    parser.add_argument("--output", type=Path, default=Path("weekly_lesson_plan_report.txt"))
     parser.add_argument("--doc-title", default="G6 Life Science — Weekly Lesson Plan & Report (Auto)")
     parser.add_argument("--teacher-name", default="Teacher Name")
     parser.add_argument("--class-name", default="Life Science (G6)")
     parser.add_argument("--schedule-note", default="Tue (10:30–11:10), Thu (09:45–10:25)")
-    parser.add_argument(
-        "--teacher-materials",
-        default="Whiteboard marker, slides/handouts, textbook, timer",
-    )
-    parser.add_argument(
-        "--student-materials",
-        default="Textbook, notebook, pencil, highlighter",
-    )
-    parser.add_argument("--include-prayer", action="store_true", help="Include prayer line in lesson template")
-    parser.add_argument(
-        "--post-gdoc",
-        action="store_true",
-        help="Publish generated text to Google Docs (requires credentials)",
-    )
-    parser.add_argument(
-        "--credentials",
-        type=Path,
-        default=Path("credentials.json"),
-        help="Google OAuth client secrets JSON path",
-    )
-    parser.add_argument(
-        "--token",
-        type=Path,
-        default=Path("token.json"),
-        help="Google OAuth token cache path",
-    )
-    parser.add_argument(
-        "--service-account",
-        type=Path,
-        default=None,
-        help="Optional Google service account JSON path for non-interactive environments (e.g., GitHub Actions)",
-    )
+    parser.add_argument("--teacher-materials", default="Whiteboard marker, slides/handouts, textbook, timer")
+    parser.add_argument("--student-materials", default="Textbook, notebook, pencil, highlighter")
+    parser.add_argument("--include-prayer", action="store_true")
+    parser.add_argument("--post-gdoc", action="store_true")
+    parser.add_argument("--drive-folder-id", default="root", help="Google Drive folder ID (supports shared drives)")
+    parser.add_argument("--credentials", type=Path, default=Path("credentials.json"))
+    parser.add_argument("--token", type=Path, default=Path("token.json"))
+    parser.add_argument("--service-account", type=Path, default=None)
+    parser.add_argument("--week", type=int, default=None, help="Optional week number to generate only one week")
     return parser
 
 
@@ -261,8 +266,14 @@ def main() -> None:
     if not weeks:
         raise RuntimeError("Could not parse any week rows from syllabus PDF. Check format or parser regex.")
 
+    selected_weeks = weeks
+    if args.week is not None:
+        selected_weeks = [week for week in weeks if week.week_no == args.week]
+        if not selected_weeks:
+            raise RuntimeError(f"Week {args.week} not found in syllabus")
+
     doc_text = generate_document_text(
-        weeks=weeks,
+        weeks=selected_weeks,
         doc_title=args.doc_title,
         teacher_name=args.teacher_name,
         class_name=args.class_name,
@@ -284,12 +295,13 @@ def main() -> None:
         if args.service_account and not args.service_account.exists():
             raise FileNotFoundError(f"Service account file not found: {args.service_account}")
 
-        doc_url = publish_to_google_docs(
-            args.doc_title,
-            doc_text,
-            args.credentials,
-            args.token,
-            args.service_account,
+        doc_url = create_google_doc_in_folder(
+            doc_title=args.doc_title,
+            doc_text=doc_text,
+            folder_id=args.drive_folder_id,
+            credentials_path=args.credentials,
+            token_path=args.token,
+            service_account_path=args.service_account,
         )
         print(f"Published Google Doc: {doc_url}")
 

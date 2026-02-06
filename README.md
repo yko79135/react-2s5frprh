@@ -1,77 +1,77 @@
 # react-2s5frprh
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/yko79135/react-2s5frprh)
+## Weekly Lesson Plan Website (PDF → Draft → Shared Google Drive)
 
-## Syllabus → Weekly Lesson Plan Bot
+This project includes a website you can run locally to:
 
-This repository now includes `lessonplan_bot.py`, a Python CLI that:
+1. Upload a syllabus PDF
+2. Choose the target week
+3. Auto-generate a weekly lesson plan/report draft
+4. Upload the generated draft to a specific folder in a shared Google Drive as a Google Doc
 
-- Parses a syllabus PDF with week rows (e.g. `1주 2.23-2.27` format)
-- Drafts a weekly lesson plan + report block for each parsed week
-- Writes all generated content to a local text file
-- Optionally publishes the generated content to a new Google Doc
+Main files:
 
-### 1) Install Python dependencies
+- `web_app.py`: Streamlit website UI
+- `lessonplan_bot.py`: parsing + draft generation + Google Docs/Drive upload logic
+- `requirements-lessonplan.txt`: Python dependencies
+
+## 1) Install dependencies
 
 ```bash
 pip install -r requirements-lessonplan.txt
 ```
 
-### 2) Basic usage (generate local draft)
+## 2) Run the website
+
+```bash
+streamlit run web_app.py
+```
+
+Then open the local URL shown in terminal (usually `http://localhost:8501`).
+
+## 3) Use the website
+
+- Upload your syllabus PDF
+- Select week from the parsed list
+- Fill teacher/class settings
+- Enter **Drive folder ID** (target folder in shared drive)
+- Upload a **service account JSON** file
+- Click **Generate Draft**
+
+The app will:
+
+- show the generated weekly draft
+- allow TXT download
+- upload to Google Docs in your selected Drive folder (if upload is enabled)
+
+## Google permissions you need
+
+Your service account must have permission to create files in the target shared-drive folder.
+
+- Share the folder (or shared drive) with the service account email
+- Ensure Google Drive API + Google Docs API are enabled in your Google Cloud project
+
+## Optional CLI usage (advanced)
+
+You can still run the CLI directly:
 
 ```bash
 python lessonplan_bot.py \
   --syllabus "2025-2026 SS Syllabus Science G6.pdf" \
+  --week 3 \
   --output weekly_lesson_plan_report.txt \
-  --teacher-name "고영찬" \
-  --class-name "Life Science (G6)"
+  --post-gdoc \
+  --drive-folder-id "YOUR_FOLDER_ID" \
+  --service-account service-account.json
 ```
 
-### 3) Publish directly to Google Docs (local OAuth)
+## Download as ZIP for local use
 
-1. In Google Cloud Console, enable:
-   - Google Docs API
-   - Google Drive API
-2. Create OAuth Client ID credentials for **Desktop app**
-3. Save the downloaded file as `credentials.json` (or pass a custom path via `--credentials`)
-4. Run:
+From repo root:
 
 ```bash
-python lessonplan_bot.py \
-  --syllabus "2025-2026 SS Syllabus Science G6.pdf" \
-  --output weekly_lesson_plan_report.txt \
-  --post-gdoc
+zip -r lessonplan-website.zip . \
+  -x "node_modules/*" ".git/*" "__pycache__/*" "*.pyc"
 ```
 
-On first run, the script opens a browser for OAuth login and stores a token in `token.json`.
-
-### 4) Run this in a new GitHub Environment (GitHub Actions)
-
-A workflow is included at `.github/workflows/lessonplan-bot.yml` and uses the GitHub Environment named **`lessonplan-bot`**.
-
-1. In your GitHub repo, go to **Settings → Environments → New environment** and create `lessonplan-bot`.
-2. (Optional, only if posting to Google Docs) add environment secret:
-   - `GOOGLE_SERVICE_ACCOUNT_JSON` = full JSON contents of your Google service account key
-3. Go to **Actions → Lesson Plan Bot → Run workflow**.
-4. Fill inputs:
-   - `syllabus_path`: PDF path in repo
-   - `output_path`: output `.txt`
-   - `doc_title`: document title
-   - `post_to_gdoc`: true/false
-
-The workflow uploads the generated output as an artifact (`lesson-plan-output`).
-
-> If `post_to_gdoc=true`, the workflow uses `--service-account` for non-interactive Google auth, which is suitable for CI.
-
-Security note: local auth/secrets files (`credentials.json`, `token.json`, and `service-account.json`) are gitignored and should never be committed.
-
-### Useful options
-
-- `--doc-title "Custom document title"`
-- `--schedule-note "Tue (10:30–11:10), Thu (09:45–10:25)"`
-- `--include-prayer`
-- `--teacher-materials "..."`
-- `--student-materials "..."`
-- `--credentials path/to/credentials.json`
-- `--token path/to/token.json`
-- `--service-account path/to/service-account.json`
+Security: never commit `credentials.json`, `token.json`, or service-account key files.
