@@ -63,6 +63,8 @@ The workflow uploads the generated output as an artifact (`lesson-plan-output`).
 
 > If `post_to_gdoc=true`, the workflow uses `--service-account` for non-interactive Google auth, which is suitable for CI.
 
+Security note: local auth/secrets files (`credentials.json`, `token.json`, and `service-account.json`) are gitignored and should never be committed.
+
 ### Useful options
 
 - `--doc-title "Custom document title"`

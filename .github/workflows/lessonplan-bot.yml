@@ -24,6 +24,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: lessonplan-bot
 
     steps:
@@ -34,6 +35,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: pip install -r requirements-lessonplan.txt
@@ -67,3 +69,7 @@ jobs:
         with:
           name: lesson-plan-output
           path: ${{ inputs.output_path }}
+
+      - name: Cleanup temporary secrets
+        if: ${{ always() && inputs.post_to_gdoc }}
+        run: rm -f service-account.json
