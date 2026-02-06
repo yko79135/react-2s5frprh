@@ -27,7 +27,7 @@ python lessonplan_bot.py \
   --class-name "Life Science (G6)"
 ```
 
-### 3) Publish directly to Google Docs
+### 3) Publish directly to Google Docs (local OAuth)
 
 1. In Google Cloud Console, enable:
    - Google Docs API
@@ -45,6 +45,24 @@ python lessonplan_bot.py \
 
 On first run, the script opens a browser for OAuth login and stores a token in `token.json`.
 
+### 4) Run this in a new GitHub Environment (GitHub Actions)
+
+A workflow is included at `.github/workflows/lessonplan-bot.yml` and uses the GitHub Environment named **`lessonplan-bot`**.
+
+1. In your GitHub repo, go to **Settings → Environments → New environment** and create `lessonplan-bot`.
+2. (Optional, only if posting to Google Docs) add environment secret:
+   - `GOOGLE_SERVICE_ACCOUNT_JSON` = full JSON contents of your Google service account key
+3. Go to **Actions → Lesson Plan Bot → Run workflow**.
+4. Fill inputs:
+   - `syllabus_path`: PDF path in repo
+   - `output_path`: output `.txt`
+   - `doc_title`: document title
+   - `post_to_gdoc`: true/false
+
+The workflow uploads the generated output as an artifact (`lesson-plan-output`).
+
+> If `post_to_gdoc=true`, the workflow uses `--service-account` for non-interactive Google auth, which is suitable for CI.
+
 ### Useful options
 
 - `--doc-title "Custom document title"`
@@ -54,3 +72,4 @@ On first run, the script opens a browser for OAuth login and stores a token in `
 - `--student-materials "..."`
 - `--credentials path/to/credentials.json`
 - `--token path/to/token.json`
+- `--service-account path/to/service-account.json`

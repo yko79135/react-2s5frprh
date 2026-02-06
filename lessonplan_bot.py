@@ -9,8 +9,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-from pypdf import PdfReader
-
 
 @dataclass
 class WeekItem:
@@ -21,6 +19,13 @@ class WeekItem:
 
 
 def extract_pdf_text(path: Path) -> str:
+    try:
+        from pypdf import PdfReader
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "Missing dependency 'pypdf'. Install requirements with: pip install -r requirements-lessonplan.txt"
+        ) from exc
+
     reader = PdfReader(str(path))
     return "\n".join((page.extract_text() or "") for page in reader.pages)
 
@@ -145,8 +150,15 @@ def generate_document_text(
     return header + body
 
 
-def publish_to_google_docs(doc_title: str, doc_text: str, credentials_path: Path, token_path: Path) -> str:
+def publish_to_google_docs(
+    doc_title: str,
+    doc_text: str,
+    credentials_path: Path,
+    token_path: Path,
+    service_account_path: Path | None,
+) -> str:
     from google.oauth2.credentials import Credentials
+    from google.oauth2.service_account import Credentials as ServiceAccountCredentials
     from google_auth_oauthlib.flow import InstalledAppFlow
     from googleapiclient.discovery import build
 
@@ -155,14 +167,17 @@ def publish_to_google_docs(doc_title: str, doc_text: str, credentials_path: Path
         "https://www.googleapis.com/auth/drive.file",
     ]
 
-    creds = None
-    if token_path.exists():
-        creds = Credentials.from_authorized_user_file(str(token_path), scopes)
+    if service_account_path:
+        creds = ServiceAccountCredentials.from_service_account_file(str(service_account_path), scopes=scopes)
+    else:
+        creds = None
+        if token_path.exists():
+            creds = Credentials.from_authorized_user_file(str(token_path), scopes)
 
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), scopes)
-        creds = flow.run_local_server(port=0)
-        token_path.write_text(creds.to_json(), encoding="utf-8")
+        if not creds or not creds.valid:
+            flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), scopes)
+            creds = flow.run_local_server(port=0)
+            token_path.write_text(creds.to_json(), encoding="utf-8")
 
     docs_service = build("docs", "v1", credentials=creds)
     doc = docs_service.documents().create(body={"title": doc_title}).execute()
@@ -226,6 +241,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("token.json"),
         help="Google OAuth token cache path",
     )
+    parser.add_argument(
+        "--service-account",
+        type=Path,
+        default=None,
+        help="Optional Google service account JSON path for non-interactive environments (e.g., GitHub Actions)",
+    )
     return parser
 
 
@@ -255,12 +276,21 @@ def main() -> None:
     print(f"Saved generated plan/report to: {args.output}")
 
     if args.post_gdoc:
-        if not args.credentials.exists():
+        if not args.service_account and not args.credentials.exists():
             raise FileNotFoundError(
                 f"Google credentials file not found: {args.credentials}. "
                 "Download OAuth Desktop App credentials from Google Cloud Console first."
             )
-        doc_url = publish_to_google_docs(args.doc_title, doc_text, args.credentials, args.token)
+        if args.service_account and not args.service_account.exists():
+            raise FileNotFoundError(f"Service account file not found: {args.service_account}")
+
+        doc_url = publish_to_google_docs(
+            args.doc_title,
+            doc_text,
+            args.credentials,
+            args.token,
+            args.service_account,
+        )
         print(f"Published Google Doc: {doc_url}")
 
 
