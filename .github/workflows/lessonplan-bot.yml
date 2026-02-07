@@ -1,0 +1,75 @@
+name: Lesson Plan Bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      syllabus_path:
+        description: "Path to syllabus PDF in repository"
+        required: true
+        default: "2025-2026 SS Syllabus Science G6.pdf"
+      output_path:
+        description: "Output text file path"
+        required: true
+        default: "weekly_lesson_plan_report.txt"
+      doc_title:
+        description: "Google Doc title"
+        required: true
+        default: "G6 Life Science — Weekly Lesson Plan & Report (Auto)"
+      post_to_gdoc:
+        description: "Post to Google Docs"
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: lessonplan-bot
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-lessonplan.txt
+
+      - name: Write service account secret
+        if: ${{ inputs.post_to_gdoc }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "GOOGLE_SERVICE_ACCOUNT_JSON secret is required when post_to_gdoc=true"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICE_ACCOUNT_JSON" > service-account.json
+
+      - name: Generate lesson plans
+        run: |
+          set -e
+          EXTRA_ARGS=""
+          if [ "${{ inputs.post_to_gdoc }}" = "true" ]; then
+            EXTRA_ARGS="--post-gdoc --service-account service-account.json"
+          fi
+          python lessonplan_bot.py \
+            --syllabus "${{ inputs.syllabus_path }}" \
+            --output "${{ inputs.output_path }}" \
+            --doc-title "${{ inputs.doc_title }}" \
+            $EXTRA_ARGS
+
+      - name: Upload generated file
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesson-plan-output
+          path: ${{ inputs.output_path }}
+
+      - name: Cleanup temporary secrets
+        if: ${{ always() && inputs.post_to_gdoc }}
+        run: rm -f service-account.json
