@@ -87,16 +87,24 @@ def build_week_text(
     teacher_materials: str,
     student_materials: str,
     include_prayer: bool,
+    subject: str | None = None,
+    class_plan_input: str | None = None,
 ) -> str:
     events_text = "\n".join(f"- {event}" for event in week.events) if week.events else "- (No special events listed)"
 
     prayer_line = "Start with a prayer.\n" if include_prayer else ""
+    subject_line = subject or class_name
+    class_plan_line = class_plan_input.strip() if class_plan_input else "(No additional class plan note provided)"
 
     return f"""Week {week.week_no} ({week.date_range})
 
 Teacher: {teacher_name}
 Class: {class_name}
+Subject: {subject_line}
 Schedule: {schedule_note}
+
+Teacher class plan input
+- {class_plan_line}
 
 Materials
 - Teacher: {teacher_materials}

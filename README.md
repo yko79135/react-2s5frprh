@@ -4,10 +4,11 @@
 
 This project includes a website you can run locally to:
 
-1. Upload a syllabus PDF
-2. Choose the target week
-3. Auto-generate a weekly lesson plan/report draft
-4. Upload the generated draft to a specific folder in a shared Google Drive as a Google Doc
+1. Upload syllabus PDFs into a persistent syllabus library
+2. Choose subject + week
+3. Add a brief class-plan note
+4. Auto-generate a weekly lesson plan/report draft
+5. Upload the generated draft to a specific folder in a shared Google Drive as a Google Doc
 
 Main files:
 
@@ -31,16 +32,30 @@ Then open the local URL shown in terminal (usually `http://localhost:8501`).
 
 ## 3) Use the website
 
-- Upload your syllabus PDF
-- Select week from the parsed list
+### Syllabus library (persistent)
+
+- Upload a syllabus PDF and click **Save uploaded syllabus**
+- The file is stored under `data/syllabi/` and indexed in `data/syllabi_index.json`
+- Saved syllabuses stay available until you delete them from the app
+
+### Draft inputs
+
+- Select a saved syllabus
+- Input **subject**
+- Select **week**
+- Add a brief **class plan note**
 - Fill teacher/class settings
-- Enter **Drive folder ID** (target folder in shared drive)
-- Upload a **service account JSON** file
+
+### Google Drive upload (optional)
+
+- Enable upload
+- Enter target **shared Drive folder ID**
+- Upload a **service account JSON**
 - Click **Generate Draft**
 
 The app will:
 
-- show the generated weekly draft
+- show generated weekly draft text
 - allow TXT download
 - upload to Google Docs in your selected Drive folder (if upload is enabled)
 
