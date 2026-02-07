@@ -20,17 +20,35 @@ class WeekItem:
 
 
 def _get_pdf_reader(binary_data: bytes | None = None, path: Path | None = None):
+    pdf_reader_cls = None
+    missing_errors: list[str] = []
+
     try:
-        from pypdf import PdfReader
+        from pypdf import PdfReader as PypdfReader
+
+        pdf_reader_cls = PypdfReader
     except ModuleNotFoundError as exc:
+        missing_errors.append(f"pypdf: {exc}")
+
+    if pdf_reader_cls is None:
+        try:
+            from PyPDF2 import PdfReader as PyPDF2Reader
+
+            pdf_reader_cls = PyPDF2Reader
+        except ModuleNotFoundError as exc:
+            missing_errors.append(f"PyPDF2: {exc}")
+
+    if pdf_reader_cls is None:
+        details = " | ".join(missing_errors)
         raise ModuleNotFoundError(
-            "Missing dependency 'pypdf'. Install requirements with: pip install -r requirements-lessonplan.txt"
-        ) from exc
+            "Missing PDF parser dependency. Install with: pip install -r requirements-lessonplan.txt "
+            f"(details: {details})"
+        )
 
     if binary_data is not None:
-        return PdfReader(BytesIO(binary_data))
+        return pdf_reader_cls(BytesIO(binary_data))
     if path is not None:
-        return PdfReader(str(path))
+        return pdf_reader_cls(str(path))
     raise ValueError("Provide either binary_data or path")
 
 

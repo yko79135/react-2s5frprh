@@ -66,6 +66,17 @@ Your service account must have permission to create files in the target shared-d
 - Share the folder (or shared drive) with the service account email
 - Ensure Google Drive API + Google Docs API are enabled in your Google Cloud project
 
+## Troubleshooting: "Missing dependency 'pypdf'"
+
+If you see a PDF parse error, install or upgrade dependencies in your active environment:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements-lessonplan.txt
+```
+
+The app now supports either `pypdf` or `PyPDF2` as the PDF parser backend, so either package being available will work.
+
 ## Optional CLI usage (advanced)
 
 You can still run the CLI directly:
