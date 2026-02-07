@@ -41,7 +41,7 @@ def _get_pdf_reader(binary_data: bytes | None = None, path: Path | None = None):
     if pdf_reader_cls is None:
         details = " | ".join(missing_errors)
         raise ModuleNotFoundError(
-            "Missing PDF parser dependency. Install with: pip install -r requirements-lessonplan.txt "
+            "Missing PDF parser dependency. Install with: pip install -r requirements.txt (or requirements-lessonplan.txt) "
             f"(details: {details})"
         )
 
