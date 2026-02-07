@@ -228,9 +228,7 @@ def create_google_doc_in_folder(
         "parents": [folder_id],
     }
     created = (
-        drive_service.files()
-        .create(body=file_meta, fields="id", supportsAllDrives=True)
-        .execute()
+        drive_service.files().create(body=file_meta, fields="id", supportsAllDrives=True).execute()
     )
     doc_id = created["id"]
 
