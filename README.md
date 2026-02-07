@@ -14,10 +14,13 @@ This project includes a website you can run on Streamlit to:
 Main files:
 
 - `web_app.py`: Streamlit website UI
-- `lessonplan_bot.py`: parsing + draft generation logic
+- `lessonplan_bot.py`: parsing + draft generation + optional Google Docs/Drive upload logic
 - `requirements.txt`: deployment dependencies (Streamlit Cloud)
+- `requirements-lessonplan.txt`: CLI/local dependencies (same package set)
 
 ## 1) Install dependencies
+
+Use either file (they contain the same packages):
 
 ```bash
 pip install -r requirements.txt
@@ -63,14 +66,30 @@ Recommended fallback workflow:
 2. Download PDF
 3. Upload manually to your target shared-drive folder
 
-## Optional CLI usage (advanced)
+## Optional Google Drive upload (CLI)
+
+You can still publish from CLI if your credentials are set up:
 
 ```bash
 python lessonplan_bot.py \
   --syllabus "2025-2026 SS Syllabus Science G6.pdf" \
   --week 3 \
-  --output weekly_lesson_plan_report.txt
+  --output weekly_lesson_plan_report.txt \
+  --post-gdoc \
+  --drive-folder-id "YOUR_FOLDER_ID" \
+  --service-account service-account.json
 ```
+
+## Troubleshooting: PDF parser dependency
+
+If you see a parse error, install/upgrade dependencies:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+The app supports either `pypdf` or `PyPDF2`.
 
 ## Download as ZIP for local use
 
