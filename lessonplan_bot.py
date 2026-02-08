@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""Generate weekly lesson plans/reports from a syllabus PDF, with optional Google Docs publishing."""
+
 
 from __future__ import annotations
 
