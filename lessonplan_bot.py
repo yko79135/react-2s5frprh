@@ -1,3 +1,8 @@
+
+---
+
+## 2) `lessonplan_bot.py`
+```python
 #!/usr/bin/env python3
 """Generate weekly lesson plans/reports from a syllabus PDF, with optional Google Docs publishing."""
 
@@ -41,7 +46,7 @@ def _get_pdf_reader(binary_data: bytes | None = None, path: Path | None = None):
     if pdf_reader_cls is None:
         details = " | ".join(missing_errors)
         raise ModuleNotFoundError(
-            "Missing PDF parser dependency. Install with: pip install -r requirements-lessonplan.txt "
+            "Missing PDF parser dependency. Install with: pip install -r requirements.txt (or requirements-lessonplan.txt) "
             f"(details: {details})"
         )
 
@@ -228,9 +233,7 @@ def create_google_doc_in_folder(
         "parents": [folder_id],
     }
     created = (
-        drive_service.files()
-        .create(body=file_meta, fields="id", supportsAllDrives=True)
-        .execute()
+        drive_service.files().create(body=file_meta, fields="id", supportsAllDrives=True).execute()
     )
     doc_id = created["id"]
 
@@ -266,7 +269,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--syllabus", required=True, type=Path, help="Path to syllabus PDF file")
     parser.add_argument("--output", type=Path, default=Path("weekly_lesson_plan_report.txt"))
     parser.add_argument("--doc-title", default="G6 Life Science — Weekly Lesson Plan & Report (Auto)")
-    parser.add_argument("--teacher-name", default="Teacher Name")
+    parser.add_argument("--teacher-name", default="고영찬")
     parser.add_argument("--class-name", default="Life Science (G6)")
     parser.add_argument("--schedule-note", default="Tue (10:30–11:10), Thu (09:45–10:25)")
     parser.add_argument("--teacher-materials", default="Whiteboard marker, slides/handouts, textbook, timer")

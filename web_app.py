@@ -1,198 +1,339 @@
+
+---
+
+## 2) `lessonplan_bot.py`
+```python
+#!/usr/bin/env python3
+"""Generate weekly lesson plans/reports from a syllabus PDF, with optional Google Docs publishing."""
+
 from __future__ import annotations
 
-import json
+import argparse
 import re
-import tempfile
-from datetime import datetime
+from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
-
-import streamlit as st
-
-from lessonplan_bot import WeekItem, build_week_text, create_google_doc_in_folder, extract_pdf_text, parse_weeks_from_syllabus
-
-DATA_DIR = Path("data")
-SYLLABI_DIR = DATA_DIR / "syllabi"
-INDEX_PATH = DATA_DIR / "syllabi_index.json"
+from typing import Iterable
 
 
-def ensure_storage() -> None:
-    SYLLABI_DIR.mkdir(parents=True, exist_ok=True)
-    if not INDEX_PATH.exists():
-        INDEX_PATH.write_text("[]", encoding="utf-8")
+@dataclass
+class WeekItem:
+    week_no: int
+    date_range: str
+    events: list[str]
+    details: str
 
 
-def load_index() -> list[dict]:
-    ensure_storage()
+def _get_pdf_reader(binary_data: bytes | None = None, path: Path | None = None):
+    pdf_reader_cls = None
+    missing_errors: list[str] = []
+
     try:
-        return json.loads(INDEX_PATH.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return []
+        from pypdf import PdfReader as PypdfReader
 
+        pdf_reader_cls = PypdfReader
+    except ModuleNotFoundError as exc:
+        missing_errors.append(f"pypdf: {exc}")
 
-def save_index(index: list[dict]) -> None:
-    INDEX_PATH.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
-
-
-def sanitize_filename(name: str) -> str:
-    safe = re.sub(r"[^a-zA-Z0-9._-]+", "_", name).strip("_")
-    return safe or "syllabus.pdf"
-
-
-def add_syllabus(uploaded_file) -> None:
-    index = load_index()
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    safe_name = sanitize_filename(uploaded_file.name)
-    stored_name = f"{timestamp}_{safe_name}"
-    path = SYLLABI_DIR / stored_name
-    path.write_bytes(uploaded_file.read())
-
-    index.append(
-        {
-            "id": stored_name,
-            "display_name": uploaded_file.name,
-            "stored_name": stored_name,
-            "uploaded_at": datetime.now().isoformat(timespec="seconds"),
-        }
-    )
-    save_index(index)
-
-
-def remove_syllabus(syllabus_id: str) -> None:
-    index = load_index()
-    updated = [item for item in index if item["id"] != syllabus_id]
-    removed = [item for item in index if item["id"] == syllabus_id]
-
-    for item in removed:
-        file_path = SYLLABI_DIR / item["stored_name"]
-        file_path.unlink(missing_ok=True)
-
-    save_index(updated)
-
-
-def parse_weeks_for_syllabus(stored_name: str) -> list[WeekItem]:
-    text = extract_pdf_text(SYLLABI_DIR / stored_name)
-    return parse_weeks_from_syllabus(text)
-
-
-st.set_page_config(page_title="Lesson Plan Draft + Google Drive Uploader", layout="centered")
-st.title("Weekly Lesson Plan Draft Uploader")
-st.caption("Upload syllabuses permanently, pick subject/week, draft plans, and upload to shared Google Drive.")
-
-ensure_storage()
-
-st.header("1) Syllabus Library")
-new_syllabus = st.file_uploader("Upload a new syllabus PDF", type=["pdf"])
-if st.button("Save uploaded syllabus"):
-    if new_syllabus is None:
-        st.warning("Please choose a PDF before saving.")
-    else:
-        add_syllabus(new_syllabus)
-        st.success("Syllabus saved to library.")
-        st.rerun()
-
-index = load_index()
-if not index:
-    st.info("No saved syllabuses yet. Upload one to continue.")
-    st.stop()
-
-options = {f"{item['display_name']} (uploaded {item['uploaded_at']})": item for item in index}
-selected_label = st.selectbox("Select a syllabus from saved library", options=list(options.keys()))
-selected_item = options[selected_label]
-
-col1, col2 = st.columns([3, 1])
-with col1:
-    st.caption(f"Using: {selected_item['display_name']}")
-with col2:
-    if st.button("Delete this syllabus"):
-        remove_syllabus(selected_item["id"])
-        st.success("Syllabus deleted.")
-        st.rerun()
-
-try:
-    weeks = parse_weeks_for_syllabus(selected_item["stored_name"])
-except Exception as exc:  # runtime parse errors shown to user
-    st.error(f"Failed to parse selected syllabus PDF: {exc}")
-    st.stop()
-
-if not weeks:
-    st.warning("No week rows found in this PDF. Expected format like '1주 2.23-2.27'.")
-    st.stop()
-
-st.header("2) Draft Inputs")
-subject = st.text_input("Which subject is this lesson plan for?", value="Life Science")
-week_map = {f"Week {w.week_no} ({w.date_range})": w for w in weeks}
-selected_key = st.selectbox("Which week are you drafting?", options=list(week_map.keys()))
-selected_week: WeekItem = week_map[selected_key]
-
-class_plan_input = st.text_area(
-    "What do you plan to do in this class? (brief note)",
-    value="Quick review, introduce key concept, guided practice, and exit ticket.",
-)
-
-teacher_name = st.text_input("Teacher name", value="Teacher Name")
-class_name = st.text_input("Class name", value="Grade 6")
-schedule_note = st.text_input("Schedule", value="Tue (10:30–11:10), Thu (09:45–10:25)")
-teacher_materials = st.text_input("Teacher materials", value="Whiteboard marker, slides/handouts, textbook, timer")
-student_materials = st.text_input("Student materials", value="Textbook, notebook, pencil, highlighter")
-include_prayer = st.checkbox("Include prayer line", value=False)
-
-st.header("3) Optional Google Drive Upload")
-upload_to_drive = st.checkbox("Upload draft to Google Drive as Google Doc", value=True)
-drive_folder_id = st.text_input("Where in shared Google Drive to upload? (folder ID)", value="")
-doc_title = st.text_input("Google Doc title", value=f"{subject} Weekly Plan - Week {selected_week.week_no}")
-
-service_account_upload = st.file_uploader(
-    "Service account JSON (required for Drive upload)",
-    type=["json"],
-    help="Upload a Google service account JSON key that has write access to the target shared-drive folder.",
-)
-
-if st.button("Generate Draft"):
-    draft_text = build_week_text(
-        week=selected_week,
-        teacher_name=teacher_name,
-        class_name=class_name,
-        schedule_note=schedule_note,
-        teacher_materials=teacher_materials,
-        student_materials=student_materials,
-        include_prayer=include_prayer,
-        subject=subject,
-        class_plan_input=class_plan_input,
-    )
-
-    st.success("Draft generated.")
-    st.text_area("Generated draft", value=draft_text, height=420)
-    st.download_button(
-        "Download draft as .txt",
-        data=draft_text,
-        file_name=f"{subject.lower().replace(' ', '_')}_week_{selected_week.week_no}_lesson_plan_report.txt",
-        mime="text/plain",
-    )
-
-    if upload_to_drive:
-        if not drive_folder_id.strip():
-            st.error("Drive folder ID is required to upload.")
-            st.stop()
-        if service_account_upload is None:
-            st.error("Service account JSON is required for upload.")
-            st.stop()
-
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
-            tmp.write(service_account_upload.read())
-            service_account_path = Path(tmp.name)
-
+    if pdf_reader_cls is None:
         try:
-            doc_url = create_google_doc_in_folder(
-                doc_title=doc_title,
-                doc_text=draft_text,
-                folder_id=drive_folder_id.strip(),
-                credentials_path=Path("credentials.json"),
-                token_path=Path("token.json"),
-                service_account_path=service_account_path,
+            from PyPDF2 import PdfReader as PyPDF2Reader
+
+            pdf_reader_cls = PyPDF2Reader
+        except ModuleNotFoundError as exc:
+            missing_errors.append(f"PyPDF2: {exc}")
+
+    if pdf_reader_cls is None:
+        details = " | ".join(missing_errors)
+        raise ModuleNotFoundError(
+            "Missing PDF parser dependency. Install with: pip install -r requirements.txt (or requirements-lessonplan.txt) "
+            f"(details: {details})"
+        )
+
+    if binary_data is not None:
+        return pdf_reader_cls(BytesIO(binary_data))
+    if path is not None:
+        return pdf_reader_cls(str(path))
+    raise ValueError("Provide either binary_data or path")
+
+
+def extract_pdf_text(path: Path) -> str:
+    reader = _get_pdf_reader(path=path)
+    return "\n".join((page.extract_text() or "") for page in reader.pages)
+
+
+def extract_pdf_text_from_bytes(pdf_data: bytes) -> str:
+    reader = _get_pdf_reader(binary_data=pdf_data)
+    return "\n".join((page.extract_text() or "") for page in reader.pages)
+
+
+def parse_weeks_from_syllabus(text: str) -> list[WeekItem]:
+    normalized = re.sub(r"[ \t]+", " ", text)
+    normalized = re.sub(r"\n{3,}", "\n\n", normalized).strip()
+
+    week_header_re = re.compile(r"(\d+)\s*주\s+(\d{1,2}\.\d{1,2}-\d{1,2}\.\d{1,2})")
+    headers = list(week_header_re.finditer(normalized))
+    weeks: list[WeekItem] = []
+
+    for idx, match in enumerate(headers):
+        start = match.end()
+        end = headers[idx + 1].start() if idx + 1 < len(headers) else len(normalized)
+        block = normalized[start:end].strip()
+
+        lines = [line.strip() for line in block.split("\n") if line.strip()]
+        details = "TBD"
+        events = lines
+
+        if lines:
+            last = lines[-1]
+            if re.search(r"(TBD|—|-|,|\d{1,2}[A-Z])", last):
+                details = re.sub(r"\s*,\s*", ", ", last).strip()
+                events = lines[:-1]
+
+        weeks.append(
+            WeekItem(
+                week_no=int(match.group(1)),
+                date_range=match.group(2),
+                events=events,
+                details=details,
             )
-            st.success("Uploaded to Google Drive successfully.")
-            st.markdown(f"[Open Google Doc]({doc_url})")
-        except Exception as exc:  # runtime upload errors shown to user
-            st.error(f"Google Drive upload failed: {exc}")
-        finally:
-            service_account_path.unlink(missing_ok=True)
+        )
+
+    return weeks
+
+
+def build_week_text(
+    week: WeekItem,
+    teacher_name: str,
+    class_name: str,
+    schedule_note: str,
+    teacher_materials: str,
+    student_materials: str,
+    include_prayer: bool,
+    subject: str | None = None,
+    class_plan_input: str | None = None,
+) -> str:
+    events_text = "\n".join(f"- {event}" for event in week.events) if week.events else "- (No special events listed)"
+
+    prayer_line = "Start with a prayer.\n" if include_prayer else ""
+    subject_line = subject or class_name
+    class_plan_line = class_plan_input.strip() if class_plan_input else "(No additional class plan note provided)"
+
+    return f"""Week {week.week_no} ({week.date_range})
+
+Teacher: {teacher_name}
+Class: {class_name}
+Subject: {subject_line}
+Schedule: {schedule_note}
+
+Teacher class plan input
+- {class_plan_line}
+
+Materials
+- Teacher: {teacher_materials}
+- Student: {student_materials}
+
+Syllabus focus
+{events_text}
+
+Class Theme & Goal
+Theme: Week {week.week_no} — Sections {week.details}
+Goals:
+- Cover textbook sections: {week.details}
+- Check understanding with quick oral questions + one short written check
+- Collect or spot-check homework
+
+Lesson Plan (template)
+{prayer_line}Intro (5–10 min): Warm-up review from last week + key vocabulary preview.
+Development (25–35 min): Direct teaching + guided reading/discussion + mini-lab/demo if relevant.
+Practice (10–15 min): Workbook/questions + partner check.
+End (5 min): Exit ticket + homework reminder.
+
+Report (to fill after teaching)
+Evaluation:
+- What went well:
+- What needs improvement:
+
+Issues on students:
+- (Name) —
+- (Name) —
+
+--------------------------------------------
+
+"""
+
+
+def generate_document_text(
+    weeks: Iterable[WeekItem],
+    doc_title: str,
+    teacher_name: str,
+    class_name: str,
+    schedule_note: str,
+    teacher_materials: str,
+    student_materials: str,
+    include_prayer: bool,
+) -> str:
+    header = f"""{doc_title}
+
+(Generated automatically from syllabus PDF)
+
+============================================
+
+"""
+    body = "".join(
+        build_week_text(
+            week,
+            teacher_name,
+            class_name,
+            schedule_note,
+            teacher_materials,
+            student_materials,
+            include_prayer,
+        )
+        for week in weeks
+    )
+    return header + body
+
+
+def create_google_doc_in_folder(
+    doc_title: str,
+    doc_text: str,
+    folder_id: str,
+    credentials_path: Path,
+    token_path: Path,
+    service_account_path: Path | None,
+) -> str:
+    from google.oauth2.credentials import Credentials
+    from google.oauth2.service_account import Credentials as ServiceAccountCredentials
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from googleapiclient.discovery import build
+
+    scopes = [
+        "https://www.googleapis.com/auth/documents",
+        "https://www.googleapis.com/auth/drive.file",
+    ]
+
+    if service_account_path:
+        creds = ServiceAccountCredentials.from_service_account_file(str(service_account_path), scopes=scopes)
+    else:
+        creds = None
+        if token_path.exists():
+            creds = Credentials.from_authorized_user_file(str(token_path), scopes)
+        if not creds or not creds.valid:
+            flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), scopes)
+            creds = flow.run_local_server(port=0)
+            token_path.write_text(creds.to_json(), encoding="utf-8")
+
+    drive_service = build("drive", "v3", credentials=creds)
+    docs_service = build("docs", "v1", credentials=creds)
+
+    file_meta = {
+        "name": doc_title,
+        "mimeType": "application/vnd.google-apps.document",
+        "parents": [folder_id],
+    }
+    created = (
+        drive_service.files().create(body=file_meta, fields="id", supportsAllDrives=True).execute()
+    )
+    doc_id = created["id"]
+
+    docs_service.documents().batchUpdate(
+        documentId=doc_id,
+        body={"requests": [{"insertText": {"location": {"index": 1}, "text": doc_text}}]},
+    ).execute()
+
+    return f"https://docs.google.com/document/d/{doc_id}/edit"
+
+
+def publish_to_google_docs(
+    doc_title: str,
+    doc_text: str,
+    credentials_path: Path,
+    token_path: Path,
+    service_account_path: Path | None,
+) -> str:
+    return create_google_doc_in_folder(
+        doc_title=doc_title,
+        doc_text=doc_text,
+        folder_id="root",
+        credentials_path=credentials_path,
+        token_path=token_path,
+        service_account_path=service_account_path,
+    )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Generate weekly lesson plans/reports from a syllabus PDF and optionally post to Google Docs."
+    )
+    parser.add_argument("--syllabus", required=True, type=Path, help="Path to syllabus PDF file")
+    parser.add_argument("--output", type=Path, default=Path("weekly_lesson_plan_report.txt"))
+    parser.add_argument("--doc-title", default="G6 Life Science — Weekly Lesson Plan & Report (Auto)")
+    parser.add_argument("--teacher-name", default="고영찬")
+    parser.add_argument("--class-name", default="Life Science (G6)")
+    parser.add_argument("--schedule-note", default="Tue (10:30–11:10), Thu (09:45–10:25)")
+    parser.add_argument("--teacher-materials", default="Whiteboard marker, slides/handouts, textbook, timer")
+    parser.add_argument("--student-materials", default="Textbook, notebook, pencil, highlighter")
+    parser.add_argument("--include-prayer", action="store_true")
+    parser.add_argument("--post-gdoc", action="store_true")
+    parser.add_argument("--drive-folder-id", default="root", help="Google Drive folder ID (supports shared drives)")
+    parser.add_argument("--credentials", type=Path, default=Path("credentials.json"))
+    parser.add_argument("--token", type=Path, default=Path("token.json"))
+    parser.add_argument("--service-account", type=Path, default=None)
+    parser.add_argument("--week", type=int, default=None, help="Optional week number to generate only one week")
+    return parser
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+
+    if not args.syllabus.exists():
+        raise FileNotFoundError(f"Syllabus PDF not found: {args.syllabus}")
+
+    text = extract_pdf_text(args.syllabus)
+    weeks = parse_weeks_from_syllabus(text)
+    if not weeks:
+        raise RuntimeError("Could not parse any week rows from syllabus PDF. Check format or parser regex.")
+
+    selected_weeks = weeks
+    if args.week is not None:
+        selected_weeks = [week for week in weeks if week.week_no == args.week]
+        if not selected_weeks:
+            raise RuntimeError(f"Week {args.week} not found in syllabus")
+
+    doc_text = generate_document_text(
+        weeks=selected_weeks,
+        doc_title=args.doc_title,
+        teacher_name=args.teacher_name,
+        class_name=args.class_name,
+        schedule_note=args.schedule_note,
+        teacher_materials=args.teacher_materials,
+        student_materials=args.student_materials,
+        include_prayer=args.include_prayer,
+    )
+
+    args.output.write_text(doc_text, encoding="utf-8")
+    print(f"Saved generated plan/report to: {args.output}")
+
+    if args.post_gdoc:
+        if not args.service_account and not args.credentials.exists():
+            raise FileNotFoundError(
+                f"Google credentials file not found: {args.credentials}. "
+                "Download OAuth Desktop App credentials from Google Cloud Console first."
+            )
+        if args.service_account and not args.service_account.exists():
+            raise FileNotFoundError(f"Service account file not found: {args.service_account}")
+
+        doc_url = create_google_doc_in_folder(
+            doc_title=args.doc_title,
+            doc_text=doc_text,
+            folder_id=args.drive_folder_id,
+            credentials_path=args.credentials,
+            token_path=args.token,
+            service_account_path=args.service_account,
+        )
+        print(f"Published Google Doc: {doc_url}")
+
+
+if __name__ == "__main__":
+    main()
