@@ -1,1 +1,16 @@
 node_modules
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Lesson-plan bot local secrets/artifacts
+credentials.json
+token.json
+service-account.json
+weekly_lesson_plan_report.txt
+lessonplan-website.zip
+
+# App runtime storage
+data/syllabi/
+data/syllabi_index.json
