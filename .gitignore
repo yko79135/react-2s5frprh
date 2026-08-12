@@ -1,16 +1,17 @@
-node_modules
+# dependencies
+node_modules/
 
-# Python caches
-__pycache__/
-*.py[cod]
+# production
+/build
 
-# Lesson-plan bot local secrets/artifacts
-credentials.json
-token.json
-service-account.json
-weekly_lesson_plan_report.txt
-lessonplan-website.zip
+# misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# App runtime storage
-data/syllabi/
-data/syllabi_index.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

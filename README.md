@@ -1,26 +1,35 @@
-# react-2s5frprh
+# 찬송가 가사
 
-## Weekly Lesson Plan Website (PDF → Draft → Edit → Export)
+찬송가 번호를 입력하면 가사를 보여주는 개인용 React 앱입니다.
 
-This project includes a website you can run on Streamlit to:
-
-1. Upload syllabus PDFs into a persistent syllabus library
-2. Choose subject + week
-3. Add a brief class-plan note
-4. Auto-generate a weekly lesson plan/report draft
-5. Edit the draft before finalizing
-6. Download final draft as TXT or PDF
-
-Main files:
-
-- `web_app.py`: Streamlit website UI
-- `lessonplan_bot.py`: parsing + draft generation + optional Google Docs/Drive upload logic
-- `requirements.txt`: deployment dependencies (Streamlit Cloud)
-- `requirements-lessonplan.txt`: CLI/local dependencies (same package set)
-
-## 1) Install dependencies
-
-Use either file (they contain the same packages):
+## 실행 방법
 
 ```bash
-pip install -r requirements.txt
+npm install
+npm start
+```
+
+`http://localhost:3000` 에서 확인할 수 있습니다.
+
+## 가사 추가하기
+
+가사 데이터는 `src/data/hymns.js` 한 곳에 모여 있습니다. 아래 형식으로 항목을 추가하면 됩니다.
+
+```js
+123: {
+  title: '찬송가 제목',
+  verses: [
+    ['1절 첫째 줄', '1절 둘째 줄'],
+    ['2절 첫째 줄', '2절 둘째 줄'],
+  ],
+  chorus: ['후렴 첫째 줄', '후렴 둘째 줄'], // 후렴이 없으면 생략
+},
+```
+
+키(예: `123`)가 찬송가 번호이며, 등록된 번호는 화면 상단에 자동으로 버튼 목록으로 표시됩니다.
+
+현재는 144장(예수 나를 위하여) 하나만 등록되어 있습니다.
+
+## 배포
+
+`vercel.json`에 Create React App 설정이 되어 있어 Vercel에 바로 배포할 수 있습니다.

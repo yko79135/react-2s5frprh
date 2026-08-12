@@ -4,16 +4,189 @@
   box-sizing: border-box;
 }
 
+:root {
+  --cream: #faf6ee;
+  --paper: #fffdf8;
+  --ink: #2f2a24;
+  --muted: #8a8072;
+  --accent: #8a3324;
+  --accent-soft: #f4e6dd;
+  --border: #e6ddcc;
+}
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.search {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.search input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  outline: none;
+}
+
+.search input:focus {
+  border-color: var(--accent);
+}
+
+.search button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.search button:hover {
+  background: #742a1d;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.chip {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chip.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.content {
+  flex: 1;
+}
+
+.hint {
+  color: var(--muted);
+  text-align: center;
+  padding: 40px 0;
+}
+
+.not-found {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--muted);
+}
+
+.not-found p:first-child {
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.hymn {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+}
+
+.hymn h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hymn-number {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.verses {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.verse h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.verse p {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.verse.chorus {
+  background: var(--accent-soft);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  color: var(--muted);
+  font-size: 0.8rem;
 }

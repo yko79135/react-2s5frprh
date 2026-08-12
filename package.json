@@ -1,7 +1,7 @@
 {
-  "name": "struggle-of-the-poleis",
+  "name": "hymn-lyrics",
   "version": "1.0.0",
-  "description": "Greek city-states strategy game",
+  "description": "찬송가 번호로 가사를 찾아보는 개인용 앱",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
