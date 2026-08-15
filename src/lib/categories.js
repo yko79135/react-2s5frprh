@@ -31,6 +31,14 @@ export const CATEGORIES = {
     text: 'text-purple-700',
     chip: 'bg-purple-100 text-purple-700',
   },
+  online: {
+    label: '온라인 수업 확인',
+    dot: 'bg-sky-400',
+    bg: 'bg-sky-50',
+    border: 'border-sky-300',
+    text: 'text-sky-700',
+    chip: 'bg-sky-100 text-sky-700',
+  },
   room: {
     label: '방 정리',
     dot: 'bg-green-400',
@@ -62,6 +70,7 @@ export const CATEGORY_RANK = {
   urgent: 0,
   core: 1,
   noncore: 1,
+  online: 1,
   review: 2,
   room: 3,
   exercise: 4,
