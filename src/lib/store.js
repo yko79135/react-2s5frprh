@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { todayISO } from './dateUtils';
-import { applyRollover, buildSeedState, makeId, regenerateAutoTasks } from './planner';
+import {
+  applyRollover,
+  buildSeedState,
+  DEFAULT_COURSES,
+  makeId,
+  regenerateAutoTasks,
+  SCHOOL_SETUP_TASKS,
+} from './planner';
 
 const STORAGE_KEY = 'classPrepPlanner:v1';
 
@@ -32,11 +39,28 @@ export const usePlanner = () => {
   // client-side stand-in for the "check every Friday / every midnight"
   // automation described in the original plan — a static web app has no
   // server to run a cron job, so it re-syncs whenever it's opened instead.
+  //
+  // One-time migration: installs saved before the real teaching schedule was
+  // read from Drive have an empty course list. Backfill it (and the matching
+  // one-off setup tasks) exactly once — once courses exist, this never runs again.
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
     setState((prev) => {
-      const withRolledOver = { ...prev, tasks: applyRollover(prev.tasks, todayISO()) };
+      let next = prev;
+      if (next.courses.length === 0) {
+        const setupTasks = SCHOOL_SETUP_TASKS.map((t) => ({
+          id: makeId(),
+          priority: 'normal',
+          notes: '',
+          done: false,
+          autoKey: null,
+          createdAt: Date.now(),
+          ...t,
+        }));
+        next = { ...next, courses: DEFAULT_COURSES, tasks: [...next.tasks, ...setupTasks] };
+      }
+      const withRolledOver = { ...next, tasks: applyRollover(next.tasks, todayISO()) };
       const tasks = regenerateAutoTasks(withRolledOver);
       return { ...withRolledOver, tasks };
     });

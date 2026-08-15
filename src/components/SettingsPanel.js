@@ -3,6 +3,8 @@ import { Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { makeId } from '../lib/planner';
 
 const WEEKDAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+const TYPE_LABELS = { core: '교과', noncore: '비교과', online: '온라인' };
+const DEFAULT_LEAD_DAYS = { core: 2, noncore: 6, online: 0 };
 
 const Section = ({ title, description, children }) => (
   <section className="rounded-lg border border-gray-200 bg-white p-4">
@@ -36,14 +38,24 @@ const CourseForm = ({ onAdd }) => {
   const [type, setType] = useState('core');
   const [weekdays, setWeekdays] = useState([]);
   const [leadDays, setLeadDays] = useState(2);
+  const [startDate, setStartDate] = useState('');
 
   const submit = (e) => {
     e.preventDefault();
     if (!name.trim() || weekdays.length === 0) return;
-    onAdd({ id: makeId(), name: name.trim(), type, weekdays, leadDays: Number(leadDays), active: true });
+    onAdd({
+      id: makeId(),
+      name: name.trim(),
+      type,
+      weekdays,
+      leadDays: Number(leadDays),
+      startDate: startDate || null,
+      active: true,
+    });
     setName('');
     setWeekdays([]);
-    setLeadDays(type === 'core' ? 2 : 6);
+    setLeadDays(DEFAULT_LEAD_DAYS[type]);
+    setStartDate('');
   };
 
   return (
@@ -59,29 +71,41 @@ const CourseForm = ({ onAdd }) => {
           value={type}
           onChange={(e) => {
             setType(e.target.value);
-            setLeadDays(e.target.value === 'core' ? 2 : 6);
+            setLeadDays(DEFAULT_LEAD_DAYS[e.target.value]);
           }}
           className="rounded border border-gray-300 px-2 py-1.5 text-sm focus:border-gray-500 focus:outline-none"
         >
           <option value="core">교과 (1–2영업일 전)</option>
           <option value="noncore">비교과 (5–7일 전)</option>
+          <option value="online">온라인 진도 확인 (당일)</option>
         </select>
       </div>
       <div className="flex items-center justify-between gap-3">
         <WeekdayPicker value={weekdays} onChange={setWeekdays} />
-        <label className="flex shrink-0 items-center gap-1.5 text-xs text-gray-500">
-          준비 기간
-          <input
-            type="number"
-            min={1}
-            max={10}
-            value={leadDays}
-            onChange={(e) => setLeadDays(e.target.value)}
-            className="w-14 rounded border border-gray-300 px-1.5 py-1 text-sm focus:border-gray-500 focus:outline-none"
-          />
-          {type === 'core' ? '영업일 전' : '일 전'}
-        </label>
+        {type !== 'online' && (
+          <label className="flex shrink-0 items-center gap-1.5 text-xs text-gray-500">
+            준비 기간
+            <input
+              type="number"
+              min={1}
+              max={10}
+              value={leadDays}
+              onChange={(e) => setLeadDays(e.target.value)}
+              className="w-14 rounded border border-gray-300 px-1.5 py-1 text-sm focus:border-gray-500 focus:outline-none"
+            />
+            {type === 'core' ? '영업일 전' : '일 전'}
+          </label>
+        )}
       </div>
+      <label className="flex items-center gap-1.5 text-xs text-gray-500">
+        시작일 (선택 — 이 날짜 이전 수업은 준비 할 일을 만들지 않아요)
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="rounded border border-gray-300 px-1.5 py-1 text-xs focus:border-gray-500 focus:outline-none"
+        />
+      </label>
       <button
         type="submit"
         className="flex w-full items-center justify-center gap-1 rounded bg-gray-900 py-1.5 text-sm font-semibold text-white hover:bg-gray-800"
@@ -94,8 +118,8 @@ const CourseForm = ({ onAdd }) => {
 
 const CoursesSection = ({ courses, setCourses }) => (
   <Section
-    title="교과 · 비교과 수업"
-    description="수업 요일을 등록하면 다가오는 2주 안에서 준비 할 일이 자동으로 생겨요. 교과는 수업 1–2영업일 전, 비교과는 5–7일 전(주말·제외일 피해서)에 배치됩니다."
+    title="교과 · 비교과 · 온라인 수업"
+    description="수업 요일을 등록하면 다가오는 2주 안에서 준비 할 일이 자동으로 생겨요. 교과는 수업 1–2영업일 전, 비교과는 5–7일 전(주말·제외일 피해서)에 배치되고, 온라인 진도 확인은 수업 당일에 가벼운 체크 할 일로 생겨요. 학교 시간표(교사 Time Schedule)를 기준으로 처음부터 등록해 뒀어요 — 실라버스가 바뀌면 여기서 수정하세요."
   >
     <div className="mb-3 space-y-2">
       {courses.length === 0 && (
@@ -107,12 +131,13 @@ const CoursesSection = ({ courses, setCourses }) => (
             <div className="text-sm font-medium text-gray-800">
               {c.name}{' '}
               <span className="text-xs font-normal text-gray-400">
-                ({c.type === 'core' ? '교과' : '비교과'} · {c.leadDays}
-                {c.type === 'core' ? '영업일' : '일'} 전)
+                ({TYPE_LABELS[c.type]} ·{' '}
+                {c.type === 'online' ? '당일 확인' : `${c.leadDays}${c.type === 'core' ? '영업일' : '일'} 전`})
               </span>
             </div>
             <div className="text-[11px] text-gray-400">
               {c.weekdays.map((d) => WEEKDAY_NAMES[d]).join(', ')}요일 수업
+              {c.startDate && ` · ${c.startDate}부터`}
             </div>
           </div>
           <div className="flex items-center gap-2">

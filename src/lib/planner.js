@@ -35,6 +35,7 @@ export const getFixedScheduleForDate = (iso) => {
 // ---- auto-generators -------------------------------------------------
 
 // 교과: N business days before class. 비교과: N calendar days before, nudged off weekends/exclusions.
+// 온라인 (supervision-only classes): same day, light check-in — no lead time.
 export const generateCourseTasks = (courses, windowStart, windowEnd, excludedDates) => {
   const tasks = [];
   const scanEnd = addDays(windowEnd, 10);
@@ -42,14 +43,20 @@ export const generateCourseTasks = (courses, windowStart, windowEnd, excludedDat
     if (course.active === false) continue;
     for (const occ of dateRange(windowStart, scanEnd)) {
       if (!course.weekdays.includes(weekdayIndex(occ))) continue;
+      if (course.startDate && compareISO(occ, course.startDate) < 0) continue;
       const due =
         course.type === 'core'
           ? subtractBusinessDays(occ, course.leadDays, excludedDates)
+          : course.type === 'online'
+          ? occ
           : subtractCalendarDaysAvoiding(occ, course.leadDays, excludedDates);
       if (compareISO(due, windowStart) < 0 || compareISO(due, windowEnd) > 0) continue;
       tasks.push({
         autoKey: `course:${course.id}:${occ}`,
-        title: `${course.name} 수업 준비 (${formatMD(occ)} 수업)`,
+        title:
+          course.type === 'online'
+            ? `${course.name} — 진도 확인·채점 (${formatMD(occ)})`
+            : `${course.name} 수업 준비 (${formatMD(occ)} 수업)`,
         category: course.type,
         date: due,
         originalDate: due,
@@ -153,6 +160,71 @@ export const applyRollover = (tasks, todayIso) =>
     return t;
   });
 
+// ---- real courses, read from "교사 Time Schedule_2026 가을" (Mr. Ko's row) in Drive ----
+// startDate is the first real class day of the term (2026-08-26, Wed) — combined with the
+// weekday filter this naturally reproduces the school's actual quirk where Mon/Tue-only
+// subjects don't meet at all in the opening week (8/24–8/25 fall before the term starts).
+
+export const DEFAULT_COURSES = [
+  { id: 'math-g9', name: 'Math G9', type: 'core', weekdays: [2, 3, 5], leadDays: 2, startDate: '2026-08-26', active: true },
+  { id: 'math-g12', name: 'Math G12', type: 'core', weekdays: [1, 3], leadDays: 2, startDate: '2026-08-26', active: true },
+  { id: 'science-g4', name: 'Science G4', type: 'core', weekdays: [1, 4], leadDays: 2, startDate: '2026-08-26', active: true },
+  { id: 'science-g7k', name: '과학 G7K', type: 'core', weekdays: [1, 2], leadDays: 2, startDate: '2026-08-26', active: true },
+  { id: 'sci-exp-g3-6', name: 'Science Experiment G3-6', type: 'noncore', weekdays: [1], leadDays: 7, startDate: '2026-08-26', active: true },
+  { id: 'sci-exp-g7-12', name: 'Science Experiment G7-12', type: 'noncore', weekdays: [4], leadDays: 7, startDate: '2026-08-26', active: true },
+  { id: 'ca-newspaper', name: 'C.A. (학교신문)', type: 'noncore', weekdays: [5], leadDays: 7, startDate: '2026-08-26', active: true },
+  { id: 'musical-speaking', name: 'Musical Speaking G4-12', type: 'noncore', weekdays: [3], leadDays: 6, startDate: '2026-08-26', active: true },
+  { id: 'speaking-g4', name: 'Speaking G4', type: 'noncore', weekdays: [2], leadDays: 6, startDate: '2026-08-26', active: true },
+  {
+    id: 'online-science',
+    name: '온라인 Science (G7E/G9/G12)',
+    type: 'online',
+    weekdays: [2, 3, 4, 5],
+    leadDays: 0,
+    startDate: '2026-08-26',
+    active: true,
+  },
+];
+
+// One-off setup work for brand-new heavy courses — the recurring 1-2일/5-7일 rule only
+// covers steady-state weekly prep, not building a course's system from scratch.
+export const SCHOOL_SETUP_TASKS = [
+  {
+    title: 'Science Experiment G3-6 — 재료 확보 + Outdoor Earth Detective Walk 활동지 제작',
+    category: 'noncore',
+    date: '2026-08-16',
+    priority: 'deadline',
+    project: 'Science Experiment G3-6',
+  },
+  {
+    title: 'Science Experiment G7-12 — OT 자료·안전규칙·발표 rubric·rotation·topic approval 제작',
+    category: 'noncore',
+    date: '2026-08-17',
+    priority: 'deadline',
+    project: 'Science Experiment G7-12',
+  },
+  {
+    title: 'Musical Speaking — 재사용 가능한 warm-up/diction 루틴 세트 제작',
+    category: 'noncore',
+    date: '2026-08-19',
+    priority: 'deadline',
+    project: 'Musical Speaking',
+  },
+  {
+    title: 'Speaking G4 — 첫 2주 자료 제작',
+    category: 'noncore',
+    date: '2026-08-20',
+    priority: 'deadline',
+    project: 'Speaking G4',
+  },
+  {
+    title: '개학 Launch Check — 수/목/금 자료 최종 확인, 인쇄, 온라인 Science 링크 테스트',
+    category: 'other',
+    date: '2026-08-25',
+    priority: 'deadline',
+  },
+];
+
 // ---- seed data (the real plan carried over from the ChatGPT conversation) ----
 
 export const buildSeedState = () => {
@@ -162,6 +234,7 @@ export const buildSeedState = () => {
       category: 'urgent',
       date: '2026-08-18',
     },
+    ...SCHOOL_SETUP_TASKS,
     {
       title: '방 정리 — 전체 분류 및 바닥 통로 확보',
       category: 'room',
@@ -229,7 +302,7 @@ export const buildSeedState = () => {
 
   return {
     tasks: manualTasks,
-    courses: [],
+    courses: DEFAULT_COURSES,
     reviewProjects,
     excludedDates: ['2026-08-18', '2026-08-24'],
     exerciseWeekdays: [1, 2, 4],
