@@ -1,26 +1,58 @@
-# react-2s5frprh
+# 2026 Fall 수업 준비 계획표
 
-## Weekly Lesson Plan Website (PDF → Draft → Edit → Export)
+수업 준비, 하이성 감수, 방 정리, 급한 업무를 한 곳에서 관리하는 개인 계획 앱입니다.
+ChatGPT에게 매주 부탁하던 걸 대신할 수 있게, 브라우저에서 바로 쓰는 웹앱으로 만들었습니다.
 
-This project includes a website you can run on Streamlit to:
+## 기능
 
-1. Upload syllabus PDFs into a persistent syllabus library
-2. Choose subject + week
-3. Add a brief class-plan note
-4. Auto-generate a weekly lesson plan/report draft
-5. Edit the draft before finalizing
-6. Download final draft as TXT or PDF
+- **오늘 할 일**: 오늘 날짜의 할 일을 급선무 → 마감임박 → 일반 순으로 보여줍니다. 완료 체크
+  가능하고, 체크하지 않고 넘어간 할 일은 앱을 열 때마다 자동으로 오늘로 이월됩니다.
+- **2주 보기**: 오늘부터 앞으로 2주치 계획을 하루씩 컬럼으로 보여줍니다.
+- **자동 준비 계획**
+  - 교과 수업: 수업 **1–2영업일 전**에 준비 할 일이 자동 생성됩니다.
+  - 비교과 수업: 수업 **5–7일 전**(주말·제외일 피해서)에 자동 생성됩니다.
+  - 설정 탭에서 수업 요일과 준비 기간을 등록하면 다가오는 2주 안에서 자동으로 배치됩니다.
+- **감수 프로젝트 (하이성 등)**: 시작일~목표일 사이에 남은 회차를 자동으로 고르게 배분합니다.
+  원고가 아직 없는 챕터는 "원고 필요" 상태로 남겨두고, 나중에 회차를 채우면 다음 갱신 때
+  자동으로 배분됩니다.
+- **색상 구분**: 급선무(빨강) · 교과(파랑) · 비교과(주황) · 하이성 감수(연보라) · 방 정리
+  (연두) · 운동(청록)으로 카테고리를 구분합니다.
+- **데이터 관리**: 설정 탭에서 JSON으로 내보내기/가져오기, 초기 계획으로 되돌리기가 가능합니다.
 
-Main files:
+### 자동 갱신에 대해
 
-- `web_app.py`: Streamlit website UI
-- `lessonplan_bot.py`: parsing + draft generation + optional Google Docs/Drive upload logic
-- `requirements.txt`: deployment dependencies (Streamlit Cloud)
-- `requirements-lessonplan.txt`: CLI/local dependencies (same package set)
+원래 ChatGPT 예약 작업은 서버에서 매주 금요일마다 스스로 실행됐지만, 이 앱은 정적 웹앱이라
+사용자가 열어야만 코드가 실행됩니다. 그래서 **앱을 열 때마다** 오늘 기준으로 2주치 계획을
+다시 계산하고, 지나간 미완료 할 일을 오늘로 이월합니다. 완료 표시와 메모는 항상 보존됩니다.
+설정을 바꾼 직후에는 "지금 갱신" 버튼으로 즉시 반영할 수 있습니다.
 
-## 1) Install dependencies
+데이터는 브라우저의 localStorage에 저장됩니다(별도 로그인/서버 없음). 다른 기기에서 이어서
+쓰려면 설정 탭의 내보내기/가져오기를 사용하세요.
 
-Use either file (they contain the same packages):
+## 개발
 
 ```bash
-pip install -r requirements.txt
+npm install
+npm start      # http://localhost:3000
+npm run build  # 프로덕션 빌드 (build/)
+```
+
+Vercel에 `create-react-app` 프레임워크로 배포되도록 `vercel.json`이 설정되어 있습니다.
+
+## 구조
+
+```
+src/
+  lib/
+    dateUtils.js   # 날짜 계산 (영업일, 범위 등)
+    categories.js  # 카테고리 색상/정렬 규칙
+    planner.js     # 자동 생성 로직 + 초기 시드 데이터
+    store.js       # localStorage 연동 상태 관리 훅
+  components/
+    TodayView.js
+    TwoWeekBoard.js
+    SettingsPanel.js
+    TaskRow.js
+    AddTaskForm.js
+  App.js
+```
