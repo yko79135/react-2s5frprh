@@ -1,0 +1,934 @@
+{
+  "generatedAt": "2026-08-16T13:12:44Z",
+  "sourceCommit": "3d6fb3f91f67a4fa0b6dfc5304c0c8bc81cfc6ee",
+  "items": [
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        5
+      ],
+      "kind": "study_guide",
+      "due": "2026-08-26",
+      "eventDate": "2026-09-02",
+      "dateStatus": "exact",
+      "label": "Chapter 5 Test (exact date, from weekly log)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        5
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-08-26",
+      "eventDate": "2026-09-02",
+      "dateStatus": "exact",
+      "label": "Chapter 5 Test (exact date, from weekly log)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        1,
+        2
+      ],
+      "kind": "study_guide",
+      "due": "2026-08-30",
+      "eventDate": "2026-09-10",
+      "dateStatus": "estimated",
+      "label": "Chapters 1-2 review/assessment (estimated: last Tue/Thu of Sep7-11 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        1,
+        2
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-08-30",
+      "eventDate": "2026-09-10",
+      "dateStatus": "estimated",
+      "label": "Chapters 1-2 review/assessment (estimated: last Tue/Thu of Sep7-11 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        1
+      ],
+      "kind": "study_guide",
+      "due": "2026-08-30",
+      "eventDate": "2026-09-10",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Mon/Thu of Sep7-11 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        1
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-08-30",
+      "eventDate": "2026-09-10",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Mon/Thu of Sep7-11 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        17
+      ],
+      "kind": "study_guide",
+      "due": "2026-08-31",
+      "eventDate": "2026-09-11",
+      "dateStatus": "estimated",
+      "label": "Chapter 17 Test (estimated: last Tue/Fri of Sep7-11 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        17
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-08-31",
+      "eventDate": "2026-09-11",
+      "dateStatus": "estimated",
+      "label": "Chapter 17 Test (estimated: last Tue/Fri of Sep7-11 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        6
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-04",
+      "eventDate": "2026-09-11",
+      "dateStatus": "exact",
+      "label": "Chapter 6 Test (exact date, from weekly log)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        6
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-04",
+      "eventDate": "2026-09-11",
+      "dateStatus": "exact",
+      "label": "Chapter 6 Test (exact date, from weekly log)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        1
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-12",
+      "eventDate": "2026-09-23",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Mon/Wed of Sep21-25 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        1
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-12",
+      "eventDate": "2026-09-23",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Mon/Wed of Sep21-25 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        3
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-20",
+      "eventDate": "2026-10-01",
+      "dateStatus": "estimated",
+      "label": "Measurement laboratory/assessment, Ch3 (estimated: last Tue/Thu of Sep28-Oct2 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        3
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-20",
+      "eventDate": "2026-10-01",
+      "dateStatus": "estimated",
+      "label": "Measurement laboratory/assessment, Ch3 (estimated: last Tue/Thu of Sep28-Oct2 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        7
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-21",
+      "eventDate": "2026-10-02",
+      "dateStatus": "estimated",
+      "label": "Chapter 7 Test (estimated: last Tue/Wed/Fri of Sep28-Oct2 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        7
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-21",
+      "eventDate": "2026-10-02",
+      "dateStatus": "estimated",
+      "label": "Chapter 7 Test (estimated: last Tue/Wed/Fri of Sep28-Oct2 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        2
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-27",
+      "eventDate": "2026-10-08",
+      "dateStatus": "estimated",
+      "label": "Chapter 2 Test (estimated: last Mon/Thu of Oct5-9 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        2
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-27",
+      "eventDate": "2026-10-08",
+      "dateStatus": "estimated",
+      "label": "Chapter 2 Test (estimated: last Mon/Thu of Oct5-9 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        18
+      ],
+      "kind": "study_guide",
+      "due": "2026-09-28",
+      "eventDate": "2026-10-09",
+      "dateStatus": "estimated",
+      "label": "Chapter 18 Test (estimated: last Tue/Fri of Oct5-9 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        18
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-09-28",
+      "eventDate": "2026-10-09",
+      "dateStatus": "estimated",
+      "label": "Chapter 18 Test (estimated: last Tue/Fri of Oct5-9 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        2
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-03",
+      "eventDate": "2026-10-14",
+      "dateStatus": "estimated",
+      "label": "Chapter 2 Test (estimated: last Mon/Wed of Oct12-16 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        2
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-03",
+      "eventDate": "2026-10-14",
+      "dateStatus": "estimated",
+      "label": "Chapter 2 Test (estimated: last Mon/Wed of Oct12-16 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        8
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-05",
+      "eventDate": "2026-10-16",
+      "dateStatus": "estimated",
+      "label": "Chapter 8 Test (estimated: last Tue/Wed/Fri of Oct12-16 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        8
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-05",
+      "eventDate": "2026-10-16",
+      "dateStatus": "estimated",
+      "label": "Chapter 8 Test (estimated: last Tue/Wed/Fri of Oct12-16 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        4,
+        5,
+        6
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-11",
+      "eventDate": "2026-10-22",
+      "dateStatus": "estimated",
+      "label": "Chapters 4-6 review/assessment (estimated: last Tue/Thu of Oct19-23 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        4,
+        5,
+        6
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-11",
+      "eventDate": "2026-10-22",
+      "dateStatus": "estimated",
+      "label": "Chapters 4-6 review/assessment (estimated: last Tue/Thu of Oct19-23 week)"
+    },
+    {
+      "courseId": "g9-science-physical-science",
+      "courseName": "G9 Science",
+      "textbook": "Physical Science",
+      "edition": 6,
+      "chapters": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-17",
+      "eventDate": "2026-10-28",
+      "dateStatus": "estimated",
+      "label": "Midterm assessment, covers Ch 8B-14C (estimated: Wed of Oct26-30 week)"
+    },
+    {
+      "courseId": "g9-science-physical-science",
+      "courseName": "G9 Science",
+      "textbook": "Physical Science",
+      "edition": 6,
+      "chapters": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-17",
+      "eventDate": "2026-10-28",
+      "dateStatus": "estimated",
+      "label": "Midterm assessment, covers Ch 8B-14C (estimated: Wed of Oct26-30 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        3
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-18",
+      "eventDate": "2026-10-29",
+      "dateStatus": "estimated",
+      "label": "Chapter 3 Test (estimated: last Mon/Thu of Oct26-30 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        3
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-18",
+      "eventDate": "2026-10-29",
+      "dateStatus": "estimated",
+      "label": "Chapter 3 Test (estimated: last Mon/Thu of Oct26-30 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        19
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-19",
+      "eventDate": "2026-10-30",
+      "dateStatus": "estimated",
+      "label": "Chapter 19 Test (estimated: last Tue/Fri of Oct26-30 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        19
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-19",
+      "eventDate": "2026-10-30",
+      "dateStatus": "estimated",
+      "label": "Chapter 19 Test (estimated: last Tue/Fri of Oct26-30 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        3
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-24",
+      "eventDate": "2026-11-04",
+      "dateStatus": "estimated",
+      "label": "Chapter 3 Test (estimated: last Mon/Wed of Nov2-6 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        3
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-24",
+      "eventDate": "2026-11-04",
+      "dateStatus": "estimated",
+      "label": "Chapter 3 Test (estimated: last Mon/Wed of Nov2-6 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        9
+      ],
+      "kind": "study_guide",
+      "due": "2026-10-26",
+      "eventDate": "2026-11-06",
+      "dateStatus": "estimated",
+      "label": "Chapter 9 Test (estimated: last Tue/Wed/Fri of Nov2-6 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        9
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-10-26",
+      "eventDate": "2026-11-06",
+      "dateStatus": "estimated",
+      "label": "Chapter 9 Test (estimated: last Tue/Wed/Fri of Nov2-6 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        4
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-07",
+      "eventDate": "2026-11-18",
+      "dateStatus": "estimated",
+      "label": "Chapter 4 Test (estimated: last Mon/Wed of Nov16-20 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        4
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-07",
+      "eventDate": "2026-11-18",
+      "dateStatus": "estimated",
+      "label": "Chapter 4 Test (estimated: last Mon/Wed of Nov16-20 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        9
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-08",
+      "eventDate": "2026-11-19",
+      "dateStatus": "estimated",
+      "label": "Chapter 9 assessment (estimated: last Tue/Thu of Nov16-20 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        9
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-08",
+      "eventDate": "2026-11-19",
+      "dateStatus": "estimated",
+      "label": "Chapter 9 assessment (estimated: last Tue/Thu of Nov16-20 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        4
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-08",
+      "eventDate": "2026-11-19",
+      "dateStatus": "estimated",
+      "label": "Chapter 4 Test (estimated: last Mon/Thu of Nov16-20 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        4
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-08",
+      "eventDate": "2026-11-19",
+      "dateStatus": "estimated",
+      "label": "Chapter 4 Test (estimated: last Mon/Thu of Nov16-20 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        20
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-09",
+      "eventDate": "2026-11-20",
+      "dateStatus": "estimated",
+      "label": "Chapter 20 Test (estimated: last Tue/Fri of Nov16-20 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Life Science",
+      "edition": 5,
+      "chapters": [
+        20
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-09",
+      "eventDate": "2026-11-20",
+      "dateStatus": "estimated",
+      "label": "Chapter 20 Test (estimated: last Tue/Fri of Nov16-20 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        10
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-09",
+      "eventDate": "2026-11-20",
+      "dateStatus": "estimated",
+      "label": "Chapter 10 Test (estimated: last Tue/Wed/Fri of Nov16-20 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        10
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-09",
+      "eventDate": "2026-11-20",
+      "dateStatus": "estimated",
+      "label": "Chapter 10 Test (estimated: last Tue/Wed/Fri of Nov16-20 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        10
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-15",
+      "eventDate": "2026-11-26",
+      "dateStatus": "estimated",
+      "label": "Chapter 10 assessment (estimated: last Tue/Thu of Nov23-27 week)"
+    },
+    {
+      "courseId": "g12-science-chemistry",
+      "courseName": "G12 Science",
+      "textbook": "Chemistry",
+      "edition": 5,
+      "chapters": [
+        10
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-15",
+      "eventDate": "2026-11-26",
+      "dateStatus": "estimated",
+      "label": "Chapter 10 assessment (estimated: last Tue/Thu of Nov23-27 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        11
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-23",
+      "eventDate": "2026-12-04",
+      "dateStatus": "estimated",
+      "label": "Chapter 11 Test (estimated: last Tue/Wed/Fri of Nov30-Dec4 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        11
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-23",
+      "eventDate": "2026-12-04",
+      "dateStatus": "estimated",
+      "label": "Chapter 11 Test (estimated: last Tue/Wed/Fri of Nov30-Dec4 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        5
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-28",
+      "eventDate": "2026-12-09",
+      "dateStatus": "estimated",
+      "label": "Chapter 5 Test (estimated: last Mon/Wed of Dec7-11 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        5
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-28",
+      "eventDate": "2026-12-09",
+      "dateStatus": "estimated",
+      "label": "Chapter 5 Test (estimated: last Mon/Wed of Dec7-11 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        5
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-29",
+      "eventDate": "2026-12-10",
+      "dateStatus": "estimated",
+      "label": "Chapter 5 Test (estimated: last Mon/Thu of Dec7-11 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        5
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-29",
+      "eventDate": "2026-12-10",
+      "dateStatus": "estimated",
+      "label": "Chapter 5 Test (estimated: last Mon/Thu of Dec7-11 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Earth Science",
+      "edition": 5,
+      "chapters": [
+        1
+      ],
+      "kind": "study_guide",
+      "due": "2026-11-30",
+      "eventDate": "2026-12-11",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Tue/Fri of Dec7-11 week)"
+    },
+    {
+      "courseId": "g7e-science",
+      "courseName": "G7E Science",
+      "textbook": "Earth Science",
+      "edition": 5,
+      "chapters": [
+        1
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-11-30",
+      "eventDate": "2026-12-11",
+      "dateStatus": "estimated",
+      "label": "Chapter 1 Test (estimated: last Tue/Fri of Dec7-11 week)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        12
+      ],
+      "kind": "study_guide",
+      "due": "2026-12-07",
+      "eventDate": "2026-12-18",
+      "dateStatus": "estimated",
+      "label": "Chapter 12 Test (estimated: last Tue/Wed/Fri of Dec14-18 week; musical week, may shift)"
+    },
+    {
+      "courseId": "g9-math-geometry",
+      "courseName": "G9 Math",
+      "textbook": "Geometry",
+      "edition": 4,
+      "chapters": [
+        12
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-12-07",
+      "eventDate": "2026-12-18",
+      "dateStatus": "estimated",
+      "label": "Chapter 12 Test (estimated: last Tue/Wed/Fri of Dec14-18 week; musical week, may shift)"
+    },
+    {
+      "courseId": "g9-science-physical-science",
+      "courseName": "G9 Science",
+      "textbook": "Physical Science",
+      "edition": 6,
+      "chapters": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "kind": "study_guide",
+      "due": "2026-12-12",
+      "eventDate": "2026-12-23",
+      "dateStatus": "estimated",
+      "label": "Semester Final Exam, covers Ch 15A-22A (estimated: Wed of Dec21-25 week)"
+    },
+    {
+      "courseId": "g9-science-physical-science",
+      "courseName": "G9 Science",
+      "textbook": "Physical Science",
+      "edition": 6,
+      "chapters": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-12-12",
+      "eventDate": "2026-12-23",
+      "dateStatus": "estimated",
+      "label": "Semester Final Exam, covers Ch 15A-22A (estimated: Wed of Dec21-25 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        6
+      ],
+      "kind": "study_guide",
+      "due": "2026-12-13",
+      "eventDate": "2026-12-24",
+      "dateStatus": "estimated",
+      "label": "Chapter 6 Test / Semester Assessment (estimated: last Mon/Thu of Dec21-25 week)"
+    },
+    {
+      "courseId": "g4-science",
+      "courseName": "G4 Science",
+      "textbook": "Science 5",
+      "edition": 4,
+      "chapters": [
+        6
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-12-13",
+      "eventDate": "2026-12-24",
+      "dateStatus": "estimated",
+      "label": "Chapter 6 Test / Semester Assessment (estimated: last Mon/Thu of Dec21-25 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        6
+      ],
+      "kind": "study_guide",
+      "due": "2026-12-26",
+      "eventDate": "2027-01-06",
+      "dateStatus": "estimated",
+      "label": "Chapter 6 Test (estimated: last Mon/Wed of Jan4-6 week)"
+    },
+    {
+      "courseId": "g12-math-precalculus",
+      "courseName": "G12 Math",
+      "textbook": "BJU Precalculus",
+      "edition": 2,
+      "chapters": [
+        6
+      ],
+      "kind": "test_and_answer_key",
+      "due": "2026-12-26",
+      "eventDate": "2027-01-06",
+      "dateStatus": "estimated",
+      "label": "Chapter 6 Test (estimated: last Mon/Wed of Jan4-6 week)"
+    }
+  ]
+}
