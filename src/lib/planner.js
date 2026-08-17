@@ -118,6 +118,30 @@ export const generateExerciseTasks = (windowStart, windowEnd, weekdays) => {
   return tasks;
 };
 
+// About N times a week on the given weekdays, skipping any day that's already carrying
+// heavyLoadThreshold+ urgent/deadline tasks (근무시간 외 업무가 많은 날) — so some weeks
+// land on fewer than the target weekday count rather than piling on top of a busy day.
+const TIDY_HEAVY_LOAD_THRESHOLD = 2;
+
+export const generateTidyTasks = (windowStart, windowEnd, weekdays, deadlineLoadByDate) => {
+  const tasks = [];
+  for (const iso of dateRange(windowStart, windowEnd)) {
+    if (!weekdays.includes(weekdayIndex(iso))) continue;
+    if ((deadlineLoadByDate[iso] || 0) >= TIDY_HEAVY_LOAD_THRESHOLD) continue;
+    tasks.push({
+      autoKey: `tidy:${iso}`,
+      title: '정리 40분',
+      category: 'room',
+      date: iso,
+      originalDate: iso,
+      priority: 'normal',
+      notes: '',
+      done: false,
+    });
+  }
+  return tasks;
+};
+
 // Spreads a project's units evenly across [startDate, endDate], skipping blockoutDates.
 // Units stay in order; each available day gets floor(units/days) or ceil(units/days) of
 // them, so a unit count that doesn't divide evenly still spreads across the whole range
@@ -182,10 +206,20 @@ export const mergeAutoTasks = (existingTasks, freshAutoTasks) => {
 export const regenerateAutoTasks = (state) => {
   const windowStart = todayISO();
   const windowEnd = addDays(windowStart, 13);
-  const fresh = [
+  const courseAndAssessment = [
     ...generateCourseTasks(state.courses, windowStart, windowEnd, state.excludedDates),
     ...generateAssessmentPrepTasks(windowStart, windowEnd),
+  ];
+  const deadlineLoadByDate = {};
+  for (const t of courseAndAssessment) {
+    if (t.priority === 'urgent' || t.priority === 'deadline') {
+      deadlineLoadByDate[t.date] = (deadlineLoadByDate[t.date] || 0) + 1;
+    }
+  }
+  const fresh = [
+    ...courseAndAssessment,
     ...generateExerciseTasks(windowStart, windowEnd, state.exerciseWeekdays),
+    ...generateTidyTasks(windowStart, windowEnd, state.tidyWeekdays, deadlineLoadByDate),
     ...state.reviewProjects.flatMap(generateReviewProjectTasks),
   ];
   return mergeAutoTasks(state.tasks, fresh);
@@ -346,5 +380,8 @@ export const buildSeedState = () => {
     reviewProjects,
     excludedDates: ['2026-08-18', '2026-08-24'],
     exerciseWeekdays: [1, 2, 4],
+    // 수/목/토 — avoids 금요철야(금) and 교회 일정(일), and skips 월/화/수 (heaviest
+    // course-prep weekdays) in favor of 목(가장 가벼운 평일) and 토(고정 일정 없음).
+    tidyWeekdays: [3, 4, 6],
   };
 };
