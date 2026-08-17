@@ -152,12 +152,17 @@ export const mergeAutoTasks = (existingTasks, freshAutoTasks) => {
   const merged = freshAutoTasks.map((fresh) => {
     const prior = existingByKey.get(fresh.autoKey);
     if (prior) {
+      // A task that rolled over (or was otherwise nudged) has drifted from its
+      // computed originalDate — keep that drift. Otherwise it's still sitting on
+      // its last computed date, so let a source change (e.g. an edited project
+      // date range) move it to the new fresh date instead of pinning it forever.
+      const wasMoved = prior.date !== prior.originalDate;
       return {
         ...fresh,
         id: prior.id,
         done: prior.done,
         notes: prior.notes,
-        date: prior.date,
+        date: wasMoved ? prior.date : fresh.date,
         createdAt: prior.createdAt,
       };
     }
