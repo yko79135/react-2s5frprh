@@ -14,6 +14,7 @@ const TABS = [
 const App = () => {
   const {
     state,
+    loading,
     lastSyncedAt,
     regenerate,
     addTask,
@@ -29,6 +30,14 @@ const App = () => {
   } = usePlanner();
 
   const [tab, setTab] = useState('today');
+
+  if (loading || !state) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-400">
+        불러오는 중…
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

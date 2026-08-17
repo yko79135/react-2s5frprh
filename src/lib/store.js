@@ -8,10 +8,11 @@ import {
   regenerateAutoTasks,
   SCHOOL_SETUP_TASKS,
 } from './planner';
+import { PLANNER_STATE_ROW_ID, PLANNER_STATE_TABLE, supabase } from './supabaseClient';
 
 const STORAGE_KEY = 'classPrepPlanner:v1';
 
-const loadState = () => {
+const loadLocalCache = () => {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -21,7 +22,7 @@ const loadState = () => {
   }
 };
 
-const saveState = (state) => {
+const saveLocalCache = (state) => {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {
@@ -29,46 +30,102 @@ const saveState = (state) => {
   }
 };
 
-export const usePlanner = () => {
-  const [state, setState] = useState(() => loadState() || buildSeedState());
-  const [lastSyncedAt, setLastSyncedAt] = useState(() => Date.now());
-  const initialized = useRef(false);
+const runMigrationsAndRollover = (prev) => {
+  let next = prev;
+  if (next.courses.length === 0) {
+    const setupTasks = SCHOOL_SETUP_TASKS.map((t) => ({
+      id: makeId(),
+      priority: 'normal',
+      notes: '',
+      done: false,
+      autoKey: null,
+      createdAt: Date.now(),
+      ...t,
+    }));
+    next = { ...next, courses: DEFAULT_COURSES, tasks: [...next.tasks, ...setupTasks] };
+  }
+  const withRolledOver = { ...next, tasks: applyRollover(next.tasks, todayISO()) };
+  return { ...withRolledOver, tasks: regenerateAutoTasks(withRolledOver) };
+};
 
-  // On first mount: bring the rolling 2-week window up to date and roll
-  // over anything undone from a past date onto today. This is the
-  // client-side stand-in for the "check every Friday / every midnight"
-  // automation described in the original plan — a static web app has no
-  // server to run a cron job, so it re-syncs whenever it's opened instead.
-  //
-  // One-time migration: installs saved before the real teaching schedule was
-  // read from Drive have an empty course list. Backfill it (and the matching
-  // one-off setup tasks) exactly once — once courses exist, this never runs again.
+// Planner data lives in Supabase (table `class_prep_planner_state`, single row
+// id='default') so it can be updated from outside the browser — e.g. by an
+// agent acting on a chat request — and not just from this app's own UI.
+// localStorage is kept as a write-through cache: it seeds the very first
+// Supabase row (so nothing already on the device is lost) and lets the app
+// still render something if Supabase is briefly unreachable.
+export const usePlanner = () => {
+  const [state, setState] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [lastSyncedAt, setLastSyncedAt] = useState(() => Date.now());
+  const remoteUpdateRef = useRef(false);
+
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-    setState((prev) => {
-      let next = prev;
-      if (next.courses.length === 0) {
-        const setupTasks = SCHOOL_SETUP_TASKS.map((t) => ({
-          id: makeId(),
-          priority: 'normal',
-          notes: '',
-          done: false,
-          autoKey: null,
-          createdAt: Date.now(),
-          ...t,
-        }));
-        next = { ...next, courses: DEFAULT_COURSES, tasks: [...next.tasks, ...setupTasks] };
+    let cancelled = false;
+    let channel;
+
+    (async () => {
+      const { data, error } = await supabase
+        .from(PLANNER_STATE_TABLE)
+        .select('state')
+        .eq('id', PLANNER_STATE_ROW_ID)
+        .maybeSingle();
+
+      let initialState;
+      if (!error && data?.state) {
+        initialState = data.state;
+      } else {
+        initialState = loadLocalCache() || buildSeedState();
+        await supabase
+          .from(PLANNER_STATE_TABLE)
+          .upsert({ id: PLANNER_STATE_ROW_ID, state: initialState, updated_at: new Date().toISOString() });
       }
-      const withRolledOver = { ...next, tasks: applyRollover(next.tasks, todayISO()) };
-      const tasks = regenerateAutoTasks(withRolledOver);
-      return { ...withRolledOver, tasks };
-    });
-    setLastSyncedAt(Date.now());
+
+      const finalState = runMigrationsAndRollover(initialState);
+      if (cancelled) return;
+      setState(finalState);
+      setLoading(false);
+      setLastSyncedAt(Date.now());
+
+      channel = supabase
+        .channel('planner_state_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: PLANNER_STATE_TABLE,
+            filter: `id=eq.${PLANNER_STATE_ROW_ID}`,
+          },
+          (payload) => {
+            if (!payload.new?.state) return;
+            remoteUpdateRef.current = true;
+            setState(payload.new.state);
+            setLastSyncedAt(Date.now());
+          }
+        )
+        .subscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
-    saveState(state);
+    if (state === null) return;
+    saveLocalCache(state);
+    if (remoteUpdateRef.current) {
+      remoteUpdateRef.current = false;
+      return;
+    }
+    supabase
+      .from(PLANNER_STATE_TABLE)
+      .upsert({ id: PLANNER_STATE_ROW_ID, state, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (!error) setLastSyncedAt(Date.now());
+      });
   }, [state]);
 
   const regenerate = useCallback(() => {
@@ -77,7 +134,6 @@ export const usePlanner = () => {
       const tasks = regenerateAutoTasks(withRolledOver);
       return { ...withRolledOver, tasks };
     });
-    setLastSyncedAt(Date.now());
   }, []);
 
   const addTask = useCallback((task) => {
@@ -146,6 +202,7 @@ export const usePlanner = () => {
 
   return {
     state,
+    loading,
     lastSyncedAt,
     regenerate,
     addTask,
