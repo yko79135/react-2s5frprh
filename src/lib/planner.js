@@ -118,15 +118,17 @@ export const generateExerciseTasks = (windowStart, windowEnd, weekdays) => {
   return tasks;
 };
 
-// Spreads a project's remaining units one-per-available-day across [startDate, endDate],
-// skipping blockoutDates. If more units than days, later units double up on the last days.
+// Spreads a project's units evenly across [startDate, endDate], skipping blockoutDates.
+// Units stay in order; each available day gets floor(units/days) or ceil(units/days) of
+// them, so a unit count that doesn't divide evenly still spreads across the whole range
+// instead of piling the remainder onto the last day.
 export const generateReviewProjectTasks = (project) => {
   const available = dateRange(project.startDate, project.endDate).filter(
     (d) => !project.blockoutDates.includes(d)
   );
   if (available.length === 0 || project.units.length === 0) return [];
   return project.units.map((unit, idx) => {
-    const day = available[Math.min(idx, available.length - 1)];
+    const day = available[Math.floor((idx * available.length) / project.units.length)];
     return {
       autoKey: `review:${project.id}:${unit.id}`,
       title: `${project.name} — ${unit.label}`,
@@ -152,11 +154,12 @@ export const mergeAutoTasks = (existingTasks, freshAutoTasks) => {
   const merged = freshAutoTasks.map((fresh) => {
     const prior = existingByKey.get(fresh.autoKey);
     if (prior) {
-      // A task that rolled over (or was otherwise nudged) has drifted from its
-      // computed originalDate — keep that drift. Otherwise it's still sitting on
-      // its last computed date, so let a source change (e.g. an edited project
-      // date range) move it to the new fresh date instead of pinning it forever.
-      const wasMoved = prior.date !== prior.originalDate;
+      // A task that's done, or that rolled over (or was otherwise nudged), has
+      // drifted from its computed originalDate on purpose — keep that. Otherwise
+      // it's still sitting on its last computed date, so let a source change
+      // (e.g. an edited project date range) move it to the fresh date instead of
+      // pinning it forever.
+      const wasMoved = prior.done || prior.date !== prior.originalDate;
       return {
         ...fresh,
         id: prior.id,
