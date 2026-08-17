@@ -283,14 +283,14 @@ export const buildSeedState = () => {
     {
       title: '하이성 2 — 통합 QA (일관성·인용·쪽수 점검)',
       category: 'review',
-      date: '2026-08-27',
+      date: '2026-08-20',
       priority: 'deadline',
       project: '하이성 2',
     },
     {
       title: '하이성 2 — 최종 점검 및 완료 → 하이성 3 착수 준비',
       category: 'review',
-      date: '2026-08-28',
+      date: '2026-08-21',
       priority: 'deadline',
       project: '하이성 2',
     },
@@ -314,8 +314,8 @@ export const buildSeedState = () => {
       id: 'haiseong-2-review',
       name: '하이성 2',
       startDate: '2026-08-15',
-      endDate: '2026-08-26',
-      blockoutDates: ['2026-08-18', '2026-08-24'],
+      endDate: '2026-08-21',
+      blockoutDates: ['2026-08-18'],
       units: [
         ...chapterUnits,
         { id: 'buf1', label: '9–16장 보충·재검토' },
@@ -325,8 +325,8 @@ export const buildSeedState = () => {
     {
       id: 'haiseong-3-review',
       name: '하이성 3',
-      startDate: '2026-08-29',
-      endDate: '2026-08-29',
+      startDate: '2026-08-24',
+      endDate: '2026-09-04',
       blockoutDates: [],
       units: [{ id: 'manuscript-needed', label: '원고 필요 — 목차만 있고 쪽수 미정' }],
     },
