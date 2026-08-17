@@ -51,8 +51,11 @@ G4), 온라인(G7E/G9/G12 Science). 개강일(2026-08-26)도 각 수업의 `star
 다시 계산하고, 지나간 미완료 할 일을 오늘로 이월합니다. 완료 표시와 메모는 항상 보존됩니다.
 설정을 바꾼 직후에는 "지금 갱신" 버튼으로 즉시 반영할 수 있습니다.
 
-데이터는 브라우저의 localStorage에 저장됩니다(별도 로그인/서버 없음). 다른 기기에서 이어서
-쓰려면 설정 탭의 내보내기/가져오기를 사용하세요.
+데이터는 Supabase(`class_prep_planner_state` 테이블, 단일 행)에 저장되고, 브라우저
+localStorage는 오프라인 캐시 + 최초 마이그레이션 소스로만 씁니다. 즉 Claude와 채팅으로
+"하이성 2 마감일을 금요일로 옮겨줘" 같은 요청을 하면, Claude가 Supabase 행을 직접 갱신하고
+그 변경이 (열려 있는 탭이면 실시간으로, 아니면 새로고침 시) 앱에 바로 반영됩니다. 설정 탭의
+내보내기/가져오기는 여전히 사용할 수 있습니다.
 
 ## 개발
 
@@ -72,7 +75,8 @@ src/
     dateUtils.js   # 날짜 계산 (영업일, 범위 등)
     categories.js  # 카테고리 색상/정렬 규칙
     planner.js     # 자동 생성 로직 + 초기 시드 데이터
-    store.js       # localStorage 연동 상태 관리 훅
+    store.js       # Supabase 연동 상태 관리 훅 (localStorage는 캐시)
+    supabaseClient.js  # Supabase 클라이언트 (공개 anon 키, RLS로 접근 제한)
   components/
     TodayView.js
     TwoWeekBoard.js
