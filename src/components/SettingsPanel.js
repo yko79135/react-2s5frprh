@@ -356,6 +356,15 @@ const ExerciseSection = ({ exerciseWeekdays, setExerciseWeekdays }) => (
   </Section>
 );
 
+const TidySection = ({ tidyWeekdays, setTidyWeekdays }) => (
+  <Section
+    title="정리"
+    description="주 3회, 40분씩. 그날 근무시간 외 업무(수업/시험 준비 마감)가 이미 2건 이상이면 자동으로 건너뛰어요."
+  >
+    <WeekdayPicker value={tidyWeekdays} onChange={setTidyWeekdays} />
+  </Section>
+);
+
 const DataSection = ({ fullState, onImport, onReset }) => {
   const fileRef = useRef(null);
 
@@ -424,6 +433,7 @@ const SettingsPanel = ({
   setReviewProjects,
   setExcludedDates,
   setExerciseWeekdays,
+  setTidyWeekdays,
   onImport,
   onReset,
 }) => (
@@ -452,6 +462,7 @@ const SettingsPanel = ({
     <ReviewProjectsSection projects={state.reviewProjects} setProjects={setReviewProjects} />
     <ExcludedDatesSection excludedDates={state.excludedDates} setExcludedDates={setExcludedDates} />
     <ExerciseSection exerciseWeekdays={state.exerciseWeekdays} setExerciseWeekdays={setExerciseWeekdays} />
+    <TidySection tidyWeekdays={state.tidyWeekdays} setTidyWeekdays={setTidyWeekdays} />
     <DataSection fullState={state} onImport={onImport} onReset={onReset} />
   </div>
 );

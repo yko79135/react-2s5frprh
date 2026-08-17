@@ -25,6 +25,7 @@ const App = () => {
     setReviewProjects,
     setExcludedDates,
     setExerciseWeekdays,
+    setTidyWeekdays,
     resetToSeed,
     importState,
   } = usePlanner();
@@ -90,6 +91,7 @@ const App = () => {
             setReviewProjects={setReviewProjects}
             setExcludedDates={setExcludedDates}
             setExerciseWeekdays={setExerciseWeekdays}
+            setTidyWeekdays={setTidyWeekdays}
             onImport={importState}
             onReset={resetToSeed}
           />

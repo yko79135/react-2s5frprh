@@ -44,6 +44,9 @@ const runMigrationsAndRollover = (prev) => {
     }));
     next = { ...next, courses: DEFAULT_COURSES, tasks: [...next.tasks, ...setupTasks] };
   }
+  if (!next.tidyWeekdays) {
+    next = { ...next, tidyWeekdays: [3, 4, 6] };
+  }
   const withRolledOver = { ...next, tasks: applyRollover(next.tasks, todayISO()) };
   return { ...withRolledOver, tasks: regenerateAutoTasks(withRolledOver) };
 };
@@ -190,6 +193,10 @@ export const usePlanner = () => {
     setState((prev) => ({ ...prev, exerciseWeekdays }));
   }, []);
 
+  const setTidyWeekdays = useCallback((tidyWeekdays) => {
+    setState((prev) => ({ ...prev, tidyWeekdays }));
+  }, []);
+
   const resetToSeed = useCallback(() => {
     setState(buildSeedState());
     setLastSyncedAt(Date.now());
@@ -213,6 +220,7 @@ export const usePlanner = () => {
     setReviewProjects,
     setExcludedDates,
     setExerciseWeekdays,
+    setTidyWeekdays,
     resetToSeed,
     importState,
   };
