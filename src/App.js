@@ -73,7 +73,14 @@ const App = () => {
             onAdd={addTask}
           />
         )}
-        {tab === 'board' && <TwoWeekBoard tasks={state.tasks} onToggle={toggleTask} onAdd={addTask} />}
+        {tab === 'board' && (
+          <TwoWeekBoard
+            tasks={state.tasks}
+            onToggle={toggleTask}
+            onAdd={addTask}
+            onMove={(id, date) => updateTask(id, { date })}
+          />
+        )}
         {tab === 'settings' && (
           <SettingsPanel
             state={state}
