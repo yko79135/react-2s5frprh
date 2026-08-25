@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { CalendarDays, ListTodo, Settings as SettingsIcon } from 'lucide-react';
+import { CalendarDays, LayoutGrid, ListTodo, Settings as SettingsIcon } from 'lucide-react';
 import { usePlanner } from './lib/store';
 import TodayView from './components/TodayView';
 import TwoWeekBoard from './components/TwoWeekBoard';
+import FallTimetable from './components/FallTimetable';
 import SettingsPanel from './components/SettingsPanel';
 
 const TABS = [
   { id: 'today', label: '오늘', icon: ListTodo },
   { id: 'board', label: '2주 보기', icon: CalendarDays },
+  { id: 'timetable', label: '가을 시간표', icon: LayoutGrid },
   { id: 'settings', label: '설정', icon: SettingsIcon },
 ];
 
@@ -82,6 +84,7 @@ const App = () => {
             onMove={(id, date) => updateTask(id, { date })}
           />
         )}
+        {tab === 'timetable' && <FallTimetable courses={state.courses} />}
         {tab === 'settings' && (
           <SettingsPanel
             state={state}
