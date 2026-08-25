@@ -1,90 +1,144 @@
 import React from 'react';
-import { CATEGORIES } from '../lib/categories';
-import { FIXED_SCHEDULE } from '../lib/planner';
 
-const WEEKDAYS = [
-  { idx: 1, label: '월' },
-  { idx: 2, label: '화' },
-  { idx: 3, label: '수' },
-  { idx: 4, label: '목' },
-  { idx: 5, label: '금' },
-  { idx: 6, label: '토' },
-  { idx: 0, label: '일' },
+const DAYS = ['월', '화', '수', '목', '금'];
+
+// Real 2026 가을학기 교시별 시간표 — from "교사 Time Schedule_2026 가을" (Mr. Ko's row),
+// Google Drive. This is a hand-copied snapshot, not an automated sync: if the school
+// revises the schedule, this constant needs to be updated by hand to match.
+const PERIODS = [
+  {
+    id: 'recite',
+    label: '암송',
+    time: '08:30–',
+    subjects: { 월: null, 화: '암송', 수: '암송', 목: '암송', 금: '암송' },
+  },
+  {
+    id: 'p1',
+    label: '1교시',
+    time: '09:00–09:40',
+    subjects: { 월: '예배', 화: '성경강의', 수: 'Science (G9)', 목: 'Science Experiment (G7-12)', 금: null },
+  },
+  {
+    id: 'p2',
+    label: '2교시',
+    time: '09:45–10:25',
+    subjects: { 월: 'Math (G12)', 화: '성경강의', 수: null, 목: 'Science Experiment (G7-12)', 금: 'Science (G9)' },
+  },
+  {
+    id: 'p3',
+    label: '3교시',
+    time: '10:30–11:10',
+    subjects: { 월: 'Science (G5)', 화: 'Science (G12)', 수: 'Math (G9)', 목: 'Science (G5)', 금: 'Math (G9)' },
+  },
+  {
+    id: 'p4',
+    label: '4교시',
+    time: '11:15–11:55',
+    subjects: { 월: 'Math (G12)', 화: 'Science (G7E)', 수: 'Math (G12)', 목: 'Science (G12)', 금: 'Science (G7E)' },
+  },
+  { id: 'lunch', label: '점심', time: '12:00–13:05', lunch: true },
+  {
+    id: 'p5',
+    label: '5교시',
+    time: '13:05–13:45',
+    subjects: { 월: 'Science (G7K)', 화: 'Math (G9)', 수: null, 목: '현장학습', 금: '발표' },
+  },
+  {
+    id: 'p6',
+    label: '6교시',
+    time: '13:50–14:30',
+    subjects: { 월: 'Science Experiment (G4-6)', 화: null, 수: null, 목: '현장학습', 금: 'C.A (G5-12)' },
+  },
+  {
+    id: 'p7',
+    label: '7교시',
+    time: '14:35–15:15',
+    subjects: { 월: 'Science Experiment (G4-6)', 화: 'Science (G7K)', 수: null, 목: '현장학습', 금: '홈룸' },
+  },
+  {
+    id: 'p8',
+    label: '8교시',
+    time: '15:20–16:00',
+    subjects: { 월: null, 화: 'Speaking (G5)', 수: 'Musical Speaking (G5~12)', 목: null, 금: null },
+  },
 ];
 
-const TYPE_LEAD_LABEL = { core: '1–2영업일 전', noncore: '5–7일 전', online: '당일 확인' };
+const OTHER_SCHEDULE = [
+  { label: '온라인 Science 진도 확인', detail: 'G7E · G9 · G12 — 화·수·목·금 당일 확인 (고정 교시 없음)' },
+  { label: '금요철야', detail: '금요일 20:00–22:00' },
+  { label: '교회 일정', detail: '일요일 09:00–16:00 (8월엔 13:30까지)' },
+];
 
-const FixedEntry = ({ item }) => (
-  <div className="rounded border border-gray-200 bg-gray-50 px-2 py-1.5">
-    <div className="text-xs font-semibold text-gray-700">{item.label}</div>
-    <div className="text-[11px] text-gray-400">{item.time}</div>
-  </div>
+const Cell = ({ subject }) => (
+  <td
+    className={`border border-gray-200 px-2 py-2 text-center text-xs ${
+      subject ? 'text-gray-800' : 'text-gray-300'
+    }`}
+  >
+    {subject || '-'}
+  </td>
 );
 
-const CourseEntry = ({ course }) => {
-  const cat = CATEGORIES[course.type] || CATEGORIES.other;
-  return (
-    <div className={`rounded border px-2 py-1.5 ${cat.bg} ${cat.border}`}>
-      <div className={`text-xs font-semibold ${cat.text}`}>{course.name}</div>
-      <div className="text-[11px] text-gray-400">
-        {cat.label.replace(' 수업 준비', '').replace(' 수업 확인', '')} · {TYPE_LEAD_LABEL[course.type]}
-      </div>
+const FallTimetable = () => (
+  <div>
+    <h2 className="mb-1 text-lg font-bold text-gray-900">2026 가을학기 시간표</h2>
+    <p className="mb-3 text-xs text-gray-400">
+      교사 Time Schedule_2026 가을 (Mr. Ko) 기준 교시별 시간표예요. 학교 시간표가 바뀌면 이 화면도
+      손으로 다시 맞춰야 해요.
+    </p>
+    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <table className="w-full min-w-[560px] border-collapse text-sm">
+        <thead>
+          <tr className="bg-gray-900 text-white">
+            <th className="border border-gray-700 px-2 py-2 text-xs font-semibold">교시</th>
+            <th className="border border-gray-700 px-2 py-2 text-xs font-semibold">시간</th>
+            {DAYS.map((d) => (
+              <th key={d} className="border border-gray-700 px-2 py-2 text-xs font-semibold">
+                {d}요일
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {PERIODS.map((p) => (
+            <tr key={p.id} className={p.lunch ? 'bg-gray-50' : ''}>
+              <td className="border border-gray-200 px-2 py-2 text-center text-xs font-semibold text-gray-700">
+                {p.label}
+              </td>
+              <td className="border border-gray-200 px-2 py-2 text-center text-[11px] text-gray-400">
+                {p.time}
+              </td>
+              {p.lunch ? (
+                <td
+                  colSpan={DAYS.length}
+                  className="border border-gray-200 px-2 py-2 text-center text-xs text-gray-400"
+                >
+                  점심시간
+                </td>
+              ) : (
+                DAYS.map((d) => <Cell key={d} subject={p.subjects[d]} />)
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
-};
 
-const DayColumn = ({ idx, label, courses }) => {
-  const fixed = FIXED_SCHEDULE.filter((f) => f.weekdays.includes(idx));
-  const dayCourses = courses.filter((c) => c.active !== false && c.weekdays.includes(idx));
-
-  return (
-    <div className="flex w-40 shrink-0 flex-col rounded-lg border border-gray-200 bg-white">
-      <div className="rounded-t-lg bg-gray-900 px-2.5 py-2 text-center text-sm font-bold text-white">
-        {label}요일
-      </div>
-      <div className="flex-1 space-y-1.5 p-2">
-        {fixed.map((f) => (
-          <FixedEntry key={f.id} item={f} />
+    <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+      <h3 className="text-sm font-bold text-gray-900">교시에 없는 고정 일정</h3>
+      <ul className="mt-2 space-y-1.5 text-xs text-gray-600">
+        {OTHER_SCHEDULE.map((s) => (
+          <li
+            key={s.label}
+            className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-gray-100 pb-1.5 last:border-0 last:pb-0"
+          >
+            <span className="font-medium text-gray-800">{s.label}</span>
+            <span className="text-gray-400">{s.detail}</span>
+          </li>
         ))}
-        {dayCourses.map((c) => (
-          <CourseEntry key={c.id} course={c} />
-        ))}
-        {fixed.length === 0 && dayCourses.length === 0 && (
-          <div className="py-2 text-center text-[11px] text-gray-300">-</div>
-        )}
-      </div>
+      </ul>
     </div>
-  );
-};
-
-const FallTimetable = ({ courses }) => {
-  const termStart = courses.find((c) => c.startDate)?.startDate || '2026-08-26';
-
-  return (
-    <div>
-      <h2 className="mb-1 text-lg font-bold text-gray-900">2026 가을학기 시간표</h2>
-      <p className="mb-3 text-xs text-gray-400">
-        {termStart} 개강 기준 주간 시간표예요. 요일별 고정 일정과 수업이 함께 표시돼요. 수업 내용은
-        설정 탭의 "교과 · 비교과 · 온라인 수업"에서 수정할 수 있어요.
-      </p>
-      <div className="flex gap-3 overflow-x-auto pb-2">
-        {WEEKDAYS.map(({ idx, label }) => (
-          <DayColumn key={idx} idx={idx} label={label} courses={courses} />
-        ))}
-      </div>
-      <div className="mt-4 flex flex-wrap gap-3 text-[11px] text-gray-400">
-        <span className="flex items-center gap-1">
-          <span className={`inline-block h-2.5 w-2.5 rounded-full ${CATEGORIES.core.dot}`} /> 교과
-        </span>
-        <span className="flex items-center gap-1">
-          <span className={`inline-block h-2.5 w-2.5 rounded-full ${CATEGORIES.noncore.dot}`} /> 비교과
-        </span>
-        <span className="flex items-center gap-1">
-          <span className={`inline-block h-2.5 w-2.5 rounded-full ${CATEGORIES.online.dot}`} /> 온라인
-        </span>
-      </div>
-    </div>
-  );
-};
+  </div>
+);
 
 export default FallTimetable;

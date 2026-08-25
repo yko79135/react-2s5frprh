@@ -84,7 +84,7 @@ const App = () => {
             onMove={(id, date) => updateTask(id, { date })}
           />
         )}
-        {tab === 'timetable' && <FallTimetable courses={state.courses} />}
+        {tab === 'timetable' && <FallTimetable />}
         {tab === 'settings' && (
           <SettingsPanel
             state={state}
