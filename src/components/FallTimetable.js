@@ -87,7 +87,14 @@ const FallTimetable = () => (
       손으로 다시 맞춰야 해요.
     </p>
     <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-      <table className="w-full min-w-[560px] border-collapse text-sm">
+      <table className="w-full min-w-[560px] table-fixed border-collapse text-sm">
+        <colgroup>
+          <col className="w-16" />
+          <col className="w-24" />
+          {DAYS.map((d) => (
+            <col key={d} />
+          ))}
+        </colgroup>
         <thead>
           <tr className="bg-gray-900 text-white">
             <th className="border border-gray-700 px-2 py-2 text-xs font-semibold">교시</th>
