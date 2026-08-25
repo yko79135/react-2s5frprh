@@ -247,7 +247,9 @@ export const DEFAULT_COURSES = [
   { id: 'sci-exp-g3-6', name: 'Science Experiment G3-6', type: 'noncore', weekdays: [1], leadDays: 7, startDate: '2026-08-26', active: true },
   { id: 'sci-exp-g7-12', name: 'Science Experiment G7-12', type: 'noncore', weekdays: [4], leadDays: 7, startDate: '2026-08-26', active: true },
   { id: 'ca-newspaper', name: 'C.A. (학교신문)', type: 'noncore', weekdays: [5], leadDays: 7, startDate: '2026-08-26', active: true },
-  { id: 'musical-speaking', name: 'Musical Speaking G4-12', type: 'noncore', weekdays: [3], leadDays: 6, startDate: '2026-08-26', active: true },
+  // Cancelled 2026-08-25 (told verbally) — kept as inactive rather than deleted so it's easy to
+  // revive if the class comes back.
+  { id: 'musical-speaking', name: 'Musical Speaking G4-12', type: 'noncore', weekdays: [3], leadDays: 6, startDate: '2026-08-26', active: false },
   { id: 'speaking-g4', name: 'Speaking G4', type: 'noncore', weekdays: [2], leadDays: 6, startDate: '2026-08-26', active: true },
   {
     id: 'online-science',

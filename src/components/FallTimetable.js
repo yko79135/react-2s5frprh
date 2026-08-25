@@ -59,7 +59,7 @@ const PERIODS = [
     id: 'p8',
     label: '8교시',
     time: '15:20–16:00',
-    subjects: { 월: null, 화: 'Speaking (G5)', 수: 'Musical Speaking (G5~12)', 목: null, 금: null },
+    subjects: { 월: null, 화: 'Speaking (G5)', 수: null, 목: null, 금: null },
   },
 ];
 
@@ -84,7 +84,8 @@ const FallTimetable = () => (
     <h2 className="mb-1 text-lg font-bold text-gray-900">2026 가을학기 시간표</h2>
     <p className="mb-3 text-xs text-gray-400">
       교사 Time Schedule_2026 가을 (Mr. Ko) 기준 교시별 시간표예요. 학교 시간표가 바뀌면 이 화면도
-      손으로 다시 맞춰야 해요.
+      손으로 다시 맞춰야 해요. (수요일 8교시 Musical Speaking G5-12는 8/25 구두로 전달받아 폐강
+      처리했어요.)
     </p>
     <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
       <table className="w-full min-w-[560px] table-fixed border-collapse text-sm">
